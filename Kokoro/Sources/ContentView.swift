@@ -3,7 +3,8 @@ import AVFoundation
 
 struct ContentView: View {
     @StateObject private var viewModel = TTSViewModel()
-    @State private var inputText: String = "Hello! Welcome to FluidAudio TTS. This is a sample text to demonstrate the Kokoro text-to-speech synthesis capabilities."
+    @State private var inputText: String = "This is the [Kokoro](/kˈOkəɹO/) TTS model. It supports the [Misaki](/misˈɑki/) [G2P](G to P) engine for better currency, time and number support. Here are some examples. The item costs $5.23. The current time is 2:30 and the value of pi is 3.14 to 2 decimal places. It also supports alias replacement so things like [Dr.](Doctor) sound better and direct phonetic replacement as in, you [tomato](/təmˈɑːtQ/), I say [tomato](/təmˈAɾO/)."
+
     @FocusState private var isTextFieldFocused: Bool
     @State private var keyboardHeight: CGFloat = 0
     @StateObject private var speakerModel = SpeakerViewModel()
