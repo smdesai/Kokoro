@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21743" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" colorMatched="YES">
+    <scenes>
+        <!--Launch Screen-->
+        <scene sceneID="HZT-kw-dar">
+            <objects>
+                <viewController id="gGG-Af-udb" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="qWd-T7-xla">
+                        <rect key="frame" x="0" y="0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" translatesAutoresizingMaskIntoConstraints="NO" id="vpH-Qp-Saw">
+                                <image name="LaunchBackground" width="1" height="1"/>
+                            </imageView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="0vz-dp-8c3"/>
+                        <color key="backgroundColor" red="0.06" green="0.07" blue="0.18" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="vpH-Qp-Saw" firstAttribute="top" secondItem="qWd-T7-xla" secondAttribute="top" id="0fG-4b-b6P"/>
+                            <constraint firstAttribute="trailing" secondItem="vpH-Qp-Saw" secondAttribute="trailing" id="5vM-lq-bTQ"/>
+                            <constraint firstItem="vpH-Qp-Saw" firstAttribute="leading" secondItem="qWd-T7-xla" secondAttribute="leading" id="ad9-bP-0EW"/>
+                            <constraint firstAttribute="bottom" secondItem="vpH-Qp-Saw" secondAttribute="bottom" id="lPh-1U-vv1"/>
+                        </constraints>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="nJD-UT-zuV" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="LaunchBackground" width="1" height="1">
+            <color key="color" red="0.08" green="0.09" blue="0.2" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </image>
+    </resources>
+</document>

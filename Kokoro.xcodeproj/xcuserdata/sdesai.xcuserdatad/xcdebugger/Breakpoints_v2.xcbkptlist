@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Bucket
+   uuid = "587C5956-2D4A-44BD-A1E8-E99F69454B3A"
+   type = "1"
+   version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "AAC802DC-BE19-4CD2-927F-03154DCA1F3A"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../FluidAudio-git/Sources/FluidAudio/DownloadUtils.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "570"
+            endingLineNumber = "570"
+            landmarkName = "DownloadUtils"
+            landmarkType = "21">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "92643337-2606-4B78-90E2-8BDE97B0D3C1"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../FluidAudio-git/Sources/FluidAudio/DownloadUtils.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "585"
+            endingLineNumber = "585">
+            <Locations>
+               <Location
+                  uuid = "92643337-2606-4B78-90E2-8BDE97B0D3C1 - 44d2f208a182967e"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(1) suspend resume partial function for static FluidAudio.DownloadUtils.ensureEspeakDataBundle(in: Foundation.URL) async throws -&gt; Foundation.URL"
+                  moduleName = "Kokoro.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/sdesai/Tools/AI/FluidAudio-git/Sources/FluidAudio/DownloadUtils.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "585"
+                  endingLineNumber = "585">
+               </Location>
+               <Location
+                  uuid = "92643337-2606-4B78-90E2-8BDE97B0D3C1 - 67a342f75f585a7c"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(3) suspend resume partial function for static FluidAudio.DownloadUtils.ensureEspeakDataBundle(in: Foundation.URL) async throws -&gt; Foundation.URL"
+                  moduleName = "Kokoro.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/sdesai/Tools/AI/FluidAudio-git/Sources/FluidAudio/DownloadUtils.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "585"
+                  endingLineNumber = "585">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
+</Bucket>

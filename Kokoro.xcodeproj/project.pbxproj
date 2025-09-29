@@ -1,0 +1,427 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 63;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		002F808C805D32210882840B /* FluidAudio in Frameworks */ = {isa = PBXBuildFile; productRef = 51F9897CEC9344310B1F5703 /* FluidAudio */; };
+		3D1EAB8A52D698F9655FB975 /* KokoroStreamingSynthesizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C61562780E444FF9FBCEAA /* KokoroStreamingSynthesizer.swift */; };
+		6387C3B6945739C92042022E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDFAC97F8C5DA547D9ADC536 /* ContentView.swift */; };
+		7BB9B8B42E86457B003E3434 /* LaunchScreen.storyboard in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7BB9B8B32E86457A003E3434 /* LaunchScreen.storyboard */; };
+		7BB9B8F92E879148003E3434 /* espeak-ng-data.bundle in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7BB9B8F82E879148003E3434 /* espeak-ng-data.bundle */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		A98F3E44953FB14C80A9E9C6 /* StreamingAudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5600D50836BB5505BA22229B /* StreamingAudioPlayer.swift */; };
+		ACE9CE1C3A452A9E99ECD69C /* TTSViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9991000F7B99F4223CC127FE /* TTSViewModel.swift */; };
+		DAA9D537CAA4FB0B261DE039 /* KokoroApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CF7C7402A310A543DA4F407 /* KokoroApp.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		7BB9B8B22E864573003E3434 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 7;
+			files = (
+				7BB9B8F92E879148003E3434 /* espeak-ng-data.bundle in CopyFiles */,
+				7BB9B8B42E86457B003E3434 /* LaunchScreen.storyboard in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7BB9B8B92E864763003E3434 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		10C61562780E444FF9FBCEAA /* KokoroStreamingSynthesizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KokoroStreamingSynthesizer.swift; sourceTree = "<group>"; };
+		364C532646E173ED40E614C0 /* FluidAudio-git */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "FluidAudio-git"; path = "../FluidAudio-git"; sourceTree = SOURCE_ROOT; };
+		5600D50836BB5505BA22229B /* StreamingAudioPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamingAudioPlayer.swift; sourceTree = "<group>"; };
+		7BB9B8B32E86457A003E3434 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = Kokoro/Resources/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		7BB9B8B62E864763003E3434 /* ESpeakNG.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = ESpeakNG.xcframework; path = Frameworks/ESpeakNG.xcframework; sourceTree = "<group>"; };
+		7BB9B8F32E878DD1003E3434 /* ESpeakNG.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = ESpeakNG.xcframework; path = Frameworks/ESpeakNG.xcframework; sourceTree = "<group>"; };
+		7BB9B8F82E879148003E3434 /* espeak-ng-data.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = "espeak-ng-data.bundle"; path = "Kokoro/Resources/espeak-ng-data.bundle"; sourceTree = "<group>"; };
+		8CF7C7402A310A543DA4F407 /* KokoroApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KokoroApp.swift; sourceTree = "<group>"; };
+		9991000F7B99F4223CC127FE /* TTSViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TTSViewModel.swift; sourceTree = "<group>"; };
+		E9284AC7E0B6B77D569C9836 /* Kokoro.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Kokoro.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		FDFAC97F8C5DA547D9ADC536 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A6977FE13E7BD610F280D2F9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				002F808C805D32210882840B /* FluidAudio in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		577E4CE6FCB58495171F8E80 = {
+			isa = PBXGroup;
+			children = (
+				7BB9B8F82E879148003E3434 /* espeak-ng-data.bundle */,
+				7BB9B8F32E878DD1003E3434 /* ESpeakNG.xcframework */,
+				7BB9B8B32E86457A003E3434 /* LaunchScreen.storyboard */,
+				AB5F6C82A3FB647225BDD3CF /* Kokoro */,
+				8ED1618B0E20D83E55A061E4 /* Packages */,
+				AC64531BA106EA6641A47E4D /* Products */,
+				7BB9B8B52E864763003E3434 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		68313C4B947A8C9CBFC21A47 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				FDFAC97F8C5DA547D9ADC536 /* ContentView.swift */,
+				8CF7C7402A310A543DA4F407 /* KokoroApp.swift */,
+				10C61562780E444FF9FBCEAA /* KokoroStreamingSynthesizer.swift */,
+				5600D50836BB5505BA22229B /* StreamingAudioPlayer.swift */,
+				9991000F7B99F4223CC127FE /* TTSViewModel.swift */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		7BB9B8B52E864763003E3434 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				7BB9B8B62E864763003E3434 /* ESpeakNG.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		8ED1618B0E20D83E55A061E4 /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				364C532646E173ED40E614C0 /* FluidAudio-git */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
+		AB5F6C82A3FB647225BDD3CF /* Kokoro */ = {
+			isa = PBXGroup;
+			children = (
+				68313C4B947A8C9CBFC21A47 /* Sources */,
+			);
+			path = Kokoro;
+			sourceTree = "<group>";
+		};
+		AC64531BA106EA6641A47E4D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				E9284AC7E0B6B77D569C9836 /* Kokoro.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A3E863EAC949D824270957B6 /* Kokoro */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6D817DC2665F82D4A00676C5 /* Build configuration list for PBXNativeTarget "Kokoro" */;
+			buildPhases = (
+				6C1682DA1211616F350D2E00 /* Sources */,
+				A6977FE13E7BD610F280D2F9 /* Frameworks */,
+				7BB9B8B22E864573003E3434 /* CopyFiles */,
+				7BB9B8B92E864763003E3434 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Kokoro;
+			packageProductDependencies = (
+				51F9897CEC9344310B1F5703 /* FluidAudio */,
+			);
+			productName = Kokoro;
+			productReference = E9284AC7E0B6B77D569C9836 /* Kokoro.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A735D880EB0371D95DCC6BDC /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					A3E863EAC949D824270957B6 = {
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = A473E90A337753D735C2B29B /* Build configuration list for PBXProject "Kokoro" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 577E4CE6FCB58495171F8E80;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				1F29971CC088B08BA6C10AB3 /* XCLocalSwiftPackageReference "../FluidAudio-git" */,
+			);
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A3E863EAC949D824270957B6 /* Kokoro */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		6C1682DA1211616F350D2E00 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6387C3B6945739C92042022E /* ContentView.swift in Sources */,
+				DAA9D537CAA4FB0B261DE039 /* KokoroApp.swift in Sources */,
+				3D1EAB8A52D698F9655FB975 /* KokoroStreamingSynthesizer.swift in Sources */,
+				A98F3E44953FB14C80A9E9C6 /* StreamingAudioPlayer.swift in Sources */,
+				ACE9CE1C3A452A9E99ECD69C /* TTSViewModel.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		0C902D2BABB4DF8DFAF68955 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_BITCODE = NO;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fluidaudio.tts;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.1;
+			};
+			name = Release;
+		};
+		91E468D1DEE6F6C9540D40EA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = TA92TEWDS4;
+				INFOPLIST_FILE = Kokoro/Resources/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.sdesai.fluidaudio.tts;
+				PRODUCT_NAME = Kokoro;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		E47CAC486BCCBFA01E544E18 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_BITCODE = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fluidaudio.tts;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.1;
+			};
+			name = Debug;
+		};
+		EC8B2D8DC5B0C40C502364C5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = TA92TEWDS4;
+				INFOPLIST_FILE = Kokoro/Resources/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = com.sdesai.fluidaudio.tts;
+				PRODUCT_NAME = Kokoro;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		6D817DC2665F82D4A00676C5 /* Build configuration list for PBXNativeTarget "Kokoro" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				91E468D1DEE6F6C9540D40EA /* Debug */,
+				EC8B2D8DC5B0C40C502364C5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		A473E90A337753D735C2B29B /* Build configuration list for PBXProject "Kokoro" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E47CAC486BCCBFA01E544E18 /* Debug */,
+				0C902D2BABB4DF8DFAF68955 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		1F29971CC088B08BA6C10AB3 /* XCLocalSwiftPackageReference "../FluidAudio-git" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "../FluidAudio-git";
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		51F9897CEC9344310B1F5703 /* FluidAudio */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FluidAudio;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = A735D880EB0371D95DCC6BDC /* Project object */;
+}
