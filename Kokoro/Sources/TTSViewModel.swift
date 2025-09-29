@@ -32,7 +32,7 @@ class TTSViewModel: ObservableObject {
     private var audioPlayer: AVAudioPlayer?
     private var audioPlayerDelegate: AudioPlayerDelegate?
     private var generatedAudioURL: URL?
-    private let voice = "af_heart"
+//    private let voice = "af_heart"
     private var generationStartTime: Date?
     private var generationEndTime: Date?
     private var firstChunkTime: Date?
@@ -92,7 +92,7 @@ class TTSViewModel: ObservableObject {
         }
     }
 
-    func generateFile(from text: String) async {
+    func generateFile(from text: String, voice: String) async {
         guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             await MainActor.run {
                 self.errorMessage = "Please enter some text to synthesize"
@@ -166,7 +166,7 @@ class TTSViewModel: ObservableObject {
         }
     }
 
-    func streamAudio(from text: String) async {
+    func streamAudio(from text: String, voice: String) async {
         guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             await MainActor.run {
                 self.errorMessage = "Please enter some text to synthesize"
