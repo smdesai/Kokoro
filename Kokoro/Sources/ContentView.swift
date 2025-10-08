@@ -18,7 +18,12 @@ struct ContentView: View {
                 ScrollView {
                     VStack(spacing: 24) {
                         VStack(alignment: .leading, spacing: 16) {
+                            Label("Voice Selection", systemImage: "person.wave.2")
+                                .font(.headline)
+                                .foregroundStyle(.primary)
+
                             speakerCard
+
                             HStack {
                                 Label("Text Input", systemImage: "text.quote")
                                     .font(.headline)
@@ -114,11 +119,6 @@ struct ContentView: View {
 //                                    .fill(Color(.secondarySystemBackground))
 //                            )
 //                        }
-                        .buttonStyle(.plain)
-                        .padding(.horizontal)
-                        .disabled(viewModel.isPreWarming || viewModel.isGenerating || viewModel.isStreaming)
-                        .opacity(viewModel.isPreWarming ? 0.6 : 1.0)
-                        .animation(.easeInOut(duration: 0.2), value: viewModel.isPreWarming)
 
                         VStack(spacing: 16) {
                             HStack(spacing: 12) {
@@ -390,74 +390,62 @@ struct ContentView: View {
     
     // MARK: - Speaker Card
 
-     private var speakerCard: some View {
-         VStack(alignment: .leading, spacing: 16) {
-             Label("Voice Selection", systemImage: "person.wave.2")
-                 .font(.headline)
+    private var speakerCard: some View {
+        Menu {
+            ForEach(speakerModel.speakers) { speaker in
+                Button(action: {
+                    withAnimation(.spring(response: 0.3)) {
+                        speakerModel.selectedSpeakerId = speaker.id
+                        speakerModel.selectedSpeakerName = speaker.name
+                    }
+                }) {
+                    HStack {
+                        Text("\(speaker.flag) \(speaker.displayName)")
+                        if speakerModel.selectedSpeakerId == speaker.id {
+                            Image(systemName: "checkmark")
+                        }
+                    }
+                }
+            }
+        } label: {
+            HStack(spacing: 12) {
+                if let speaker = speakerModel.getSpeaker(id: speakerModel.selectedSpeakerId) {
+                    ZStack {
+                        Circle()
+                            .fill(Color(.tertiarySystemBackground))
+                            .frame(width: 40, height: 40)
+                        Text(speaker.flag)
+                            .font(.title2)
+                    }
 
-             Menu {
-                 ForEach(speakerModel.speakers) { speaker in
-                     Button(action: {
-                         withAnimation(.spring(response: 0.3)) {
-                             speakerModel.selectedSpeakerId = speaker.id
-                             speakerModel.selectedSpeakerName = speaker.name
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(speaker.displayName)
+                            .font(.headline)
+                            .foregroundStyle(.primary)
+                        Text("Tap to change")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
 
-                         }
-                     }) {
-                         HStack {
-                             Text("\(speaker.flag) \(speaker.displayName)")
-                             if speakerModel.selectedSpeakerId == speaker.id {
-                                 Image(systemName: "checkmark")
-                             }
-                         }
-                     }
-                 }
-             } label: {
-                 HStack {
-                     if let speaker = speakerModel.getSpeaker(id: speakerModel.selectedSpeakerId) {
-                         // Voice icon with flag
-                         ZStack {
-                             Circle()
-                                 .fill(Color(.tertiarySystemBackground))
-                                 .frame(width: 40, height: 40)
-                             Text(speaker.flag)
-                                 .font(.title2)
-                         }
+                Spacer()
 
-                         VStack(alignment: .leading, spacing: 4) {
-                             Text(speaker.displayName)
-                                 .font(.headline)
-                                 .foregroundStyle(.primary)
-                             Text("Tap to change")
-                                 .font(.caption)
-                                 .foregroundStyle(.secondary)
-                         }
-                     }
-
-                     Spacer()
-
-                     Image(systemName: "chevron.down.circle.fill")
-                         .font(.title2)
-                         .foregroundStyle(.secondary)
-                 }
-                 .padding()
-                 .background(
-                     RoundedRectangle(cornerRadius: 16)
-                         .fill(Color(.secondarySystemBackground))
-                 )
-                 .overlay(
-                     RoundedRectangle(cornerRadius: 16)
-                         .stroke(Color(.separator), lineWidth: 0.5)
-                 )
-             }
-         }
-         .padding()
-         .background(
-             RoundedRectangle(cornerRadius: 20)
-                 .fill(Color(.systemBackground))
-                 .shadow(color: Color.black.opacity(0.05), radius: 10, y: 5)
-         )
-     }
+                Image(systemName: "chevron.down.circle.fill")
+                    .font(.title2)
+                    .foregroundStyle(.secondary)
+            }
+            .padding()
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color(.secondarySystemBackground))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color(.separator), lineWidth: 0.5)
+            )
+        }
+    }
 }
 
 // MARK: - Speaker Model
