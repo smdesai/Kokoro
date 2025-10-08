@@ -3,7 +3,7 @@ import AVFoundation
 
 struct ContentView: View {
     @StateObject private var viewModel = TTSViewModel()
-    @State private var inputText: String = "This is the [Kokoro](/kˈOkəɹO/) TTS model. It supports the [Misaki](/misˈɑki/) [G2P](G to P) engine for better currency, time and number support. Here are some examples. The item costs $5.23. The current time is 2:30 and the value of pi is 3.14 to 2 decimal places. It also supports alias replacement so things like [Dr.](Doctor) sound better and direct phonetic replacement as in, you [tomato](/təmˈɑːtQ/), I say [tomato](/təmˈAɾO/)."
+    @State private var inputText: String = "This is the [Kokoro](/kˈOkəɹO/) TTS model. It supports the [Misaki](/misˈɑki/) [G2P](G to P) engine for better currency, time and number support. Here are some examples. The item costs $5.23. The current time is 2:30 and the value of pi is 3.14 to 2 decimal places. It also supports alias replacement so things like [Dr.](Doctor) sound better and direct phonetic replacement as in, you say [tomato](/təmˈɑːtQ/), I say [tomato](/təmˈAɾO/)."
 
     @FocusState private var isTextFieldFocused: Bool
     @State private var keyboardHeight: CGFloat = 0
@@ -12,16 +12,9 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                LinearGradient(
-                    gradient: Gradient(colors: [
-                        Color(red: 0.1, green: 0.2, blue: 0.45),
-                        Color(red: 0.05, green: 0.1, blue: 0.25)
-                    ]),
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-                .ignoresSafeArea()
-                
+                Color(.systemGroupedBackground)
+                    .ignoresSafeArea()
+
                 ScrollView {
                     VStack(spacing: 24) {
                         VStack(alignment: .leading, spacing: 16) {
@@ -29,10 +22,10 @@ struct ContentView: View {
                             HStack {
                                 Label("Text Input", systemImage: "text.quote")
                                     .font(.headline)
-                                    .foregroundColor(.white.opacity(0.9))
-                                
+                                    .foregroundStyle(.primary)
+
                                 Spacer()
-                                
+
                                 if !inputText.isEmpty {
                                     Button(action: {
                                         inputText = ""
@@ -43,24 +36,22 @@ struct ContentView: View {
                                             Text("Clear")
                                                 .font(.caption)
                                         }
-                                        .foregroundColor(.white.opacity(0.7))
+                                        .foregroundStyle(.secondary)
                                         .padding(.horizontal, 8)
                                         .padding(.vertical, 4)
-                                        .background(Color.white.opacity(0.2))
+                                        .background(Color(.tertiarySystemBackground))
                                         .cornerRadius(6)
                                     }
                                     .transition(.scale.combined(with: .opacity))
                                 }
                             }
-                            
+
                             TextEditor(text: $inputText)
                                 .font(.system(size: 16))
-                                .foregroundColor(.white)
                                 .scrollContentBackground(.hidden)
                                 .padding(12)
-                                .background(Color.black.opacity(0.7))
+                                .background(Color(.secondarySystemBackground))
                                 .cornerRadius(12)
-                                .shadow(color: .black.opacity(0.3), radius: 8, x: 0, y: 4)
                                 .frame(minHeight: 250, maxHeight: 450)
                                 .focused($isTextFieldFocused)
                                 .toolbar {
@@ -75,92 +66,58 @@ struct ContentView: View {
                         }
                         .padding(.horizontal)
 
-                        Button(action: {
-                            if !viewModel.isPreWarming {
-                                Task {
-                                    await viewModel.preWarm()
-                                }
-                            }
-                        }) {
-                            HStack(spacing: 16) {
-                                ZStack {
-                                    Circle()
-                                        .fill(
-                                            LinearGradient(
-                                                gradient: Gradient(colors: [
-                                                    Color(red: 0.95, green: 0.6, blue: 0.2).opacity(0.3),
-                                                    Color(red: 0.9, green: 0.35, blue: 0.25).opacity(0.15)
-                                                ]),
-                                                startPoint: .topLeading,
-                                                endPoint: .bottomTrailing
-                                            )
-                                        )
-                                        .frame(width: 44, height: 44)
-
-                                    if viewModel.isPreWarming {
-                                        ProgressView()
-                                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                                            .scaleEffect(0.8)
-                                    } else {
-                                        Image(systemName: "flame.fill")
-                                            .font(.system(size: 20, weight: .semibold))
-                                            .foregroundColor(.white)
-                                    }
-                                }
-
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text(viewModel.isPreWarming ? "Pre-warming..." : "Pre-warm Engine")
-                                        .font(.system(size: 16, weight: .semibold))
-                                        .foregroundColor(.white.opacity(0.95))
-
-                                    if let warmDuration = viewModel.lastPreWarmDuration {
-                                        Text(String(format: "Last ready in %.2f seconds", warmDuration))
-                                            .font(.caption)
-                                            .foregroundColor(.white.opacity(0.75))
-                                    } else {
-                                        Text("Prepare models for instant playback")
-                                            .font(.caption)
-                                            .foregroundColor(.white.opacity(0.75))
-                                    }
-                                }
-
-                                Spacer()
-                            }
-                            .padding(.vertical, 14)
-                            .padding(.horizontal, 20)
-                            .background(
-                                RoundedRectangle(cornerRadius: 18)
-                                    .fill(
-                                        LinearGradient(
-                                            gradient: Gradient(colors: [
-                                                Color(red: 1.0, green: 0.55, blue: 0.2).opacity(0.5),
-                                                Color(red: 0.8, green: 0.3, blue: 0.4).opacity(0.45)
-                                            ]),
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
-                                        )
-                                    )
-                            )
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 18)
-                                    .stroke(
-                                        LinearGradient(
-                                            gradient: Gradient(colors: [
-                                                Color.white.opacity(0.35),
-                                                Color.white.opacity(0.15)
-                                            ]),
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
-                                        ),
-                                        lineWidth: 1
-                                    )
-                            )
-                            .shadow(color: Color.orange.opacity(0.35), radius: 10, x: 0, y: 6)
-                        }
+//                        Button(action: {
+//                            if !viewModel.isPreWarming {
+//                                Task {
+//                                    await viewModel.preWarm()
+//                                }
+//                            }
+//                        }) {
+//                            HStack(spacing: 16) {
+//                                ZStack {
+//                                    Circle()
+//                                        .fill(Color(.tertiarySystemBackground))
+//                                        .frame(width: 44, height: 44)
+//
+//                                    if viewModel.isPreWarming {
+//                                        ProgressView()
+//                                            .scaleEffect(0.8)
+//                                    } else {
+//                                        Image(systemName: "flame.fill")
+//                                            .font(.system(size: 20, weight: .semibold))
+//                                            .foregroundColor(.orange)
+//                                    }
+//                                }
+//
+//                                VStack(alignment: .leading, spacing: 4) {
+//                                    Text(viewModel.isPreWarming ? "Pre-warming..." : "Pre-warm Engine")
+//                                        .font(.system(size: 16, weight: .semibold))
+//                                        .foregroundStyle(.primary)
+//
+//                                    if let warmDuration = viewModel.lastPreWarmDuration {
+//                                        Text(String(format: "Last ready in %.2f seconds", warmDuration))
+//                                            .font(.caption)
+//                                            .foregroundStyle(.secondary)
+//                                    } else {
+//                                        Text("Prepare models for instant playback")
+//                                            .font(.caption)
+//                                            .foregroundStyle(.secondary)
+//                                    }
+//                                }
+//
+//                                Spacer()
+//                            }
+//                            .padding(.vertical, 14)
+//                            .padding(.horizontal, 20)
+//                            .background(
+//                                RoundedRectangle(cornerRadius: 12)
+//                                    .fill(Color(.secondarySystemBackground))
+//                            )
+//                        }
                         .buttonStyle(.plain)
                         .padding(.horizontal)
                         .disabled(viewModel.isPreWarming || viewModel.isGenerating || viewModel.isStreaming)
-                        .opacity(viewModel.isPreWarming ? 0.85 : 1.0)
+                        .opacity(viewModel.isPreWarming ? 0.6 : 1.0)
                         .animation(.easeInOut(duration: 0.2), value: viewModel.isPreWarming)
 
                         VStack(spacing: 16) {
@@ -173,62 +130,23 @@ struct ContentView: View {
                                     }
                                 }) {
                                     VStack(spacing: 8) {
-                                        ZStack {
-                                            Circle()
-                                                .fill(
-                                                    LinearGradient(
-                                                        gradient: Gradient(colors: [
-                                                            Color(red: 0.3, green: 0.6, blue: 1.0).opacity(0.3),
-                                                            Color(red: 0.2, green: 0.5, blue: 0.9).opacity(0.1)
-                                                        ]),
-                                                        startPoint: .topLeading,
-                                                        endPoint: .bottomTrailing
-                                                    )
-                                                )
-                                                .frame(width: 44, height: 44)
-                                            
-                                            Image(systemName: "waveform.badge.plus")
-                                                .font(.system(size: 20, weight: .semibold))
-                                                .foregroundColor(.white)
-                                        }
+                                        Image(systemName: "waveform.badge.plus")
+                                            .font(.system(size: 24))
+                                            .foregroundColor(.blue)
+
                                         Text("Generate")
-                                            .font(.system(size: 11, weight: .medium))
-                                            .foregroundColor(.white.opacity(0.95))
+                                            .font(.system(size: 13, weight: .medium))
+                                            .foregroundStyle(.primary)
                                     }
                                     .frame(maxWidth: .infinity)
                                     .frame(height: 80)
                                     .background(
-                                        RoundedRectangle(cornerRadius: 16)
-                                            .fill(
-                                                LinearGradient(
-                                                    gradient: Gradient(colors: [
-                                                        Color(red: 0.2, green: 0.5, blue: 0.9),
-                                                        Color(red: 0.15, green: 0.4, blue: 0.85)
-                                                    ]),
-                                                    startPoint: .topLeading,
-                                                    endPoint: .bottomTrailing
-                                                )
-                                            )
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .fill(Color(.secondarySystemBackground))
                                     )
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 16)
-                                            .stroke(
-                                                LinearGradient(
-                                                    gradient: Gradient(colors: [
-                                                        Color.white.opacity(0.3),
-                                                        Color.white.opacity(0.1)
-                                                    ]),
-                                                    startPoint: .topLeading,
-                                                    endPoint: .bottomTrailing
-                                                ),
-                                                lineWidth: 1
-                                            )
-                                    )
-                                    .shadow(color: Color(red: 0.2, green: 0.5, blue: 0.9).opacity(0.4), radius: 8, x: 0, y: 4)
                                 }
                                 .disabled(viewModel.isPreWarming || viewModel.isGenerating || viewModel.isStreaming || inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                                 .opacity((viewModel.isPreWarming || viewModel.isGenerating || viewModel.isStreaming || inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) ? 0.5 : 1.0)
-                                .scaleEffect((viewModel.isPreWarming || viewModel.isGenerating || viewModel.isStreaming || inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) ? 0.95 : 1.0)
                                 .animation(.easeInOut(duration: 0.2), value: viewModel.isGenerating)
                                 
                                 // Stream button
@@ -243,141 +161,57 @@ struct ContentView: View {
                                     }
                                 }) {
                                     VStack(spacing: 8) {
-                                        ZStack {
-                                            Circle()
-                                                .fill(
-                                                    LinearGradient(
-                                                        gradient: Gradient(colors: [
-                                                            Color(red: 0.7, green: 0.4, blue: 1.0).opacity(0.3),
-                                                            Color(red: 0.6, green: 0.3, blue: 0.9).opacity(0.1)
-                                                        ]),
-                                                        startPoint: .topLeading,
-                                                        endPoint: .bottomTrailing
-                                                    )
-                                                )
-                                                .frame(width: 44, height: 44)
-                                            
-                                            if viewModel.isStreaming {
-                                                ProgressView()
-                                                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                                                    .scaleEffect(0.8)
-                                            } else if viewModel.isPlaying && viewModel.generationMode == .stream {
-                                                Image(systemName: "stop.fill")
-                                                    .font(.system(size: 20, weight: .semibold))
-                                                    .foregroundColor(.white)
-                                            } else {
-                                                Image(systemName: "antenna.radiowaves.left.and.right")
-                                                    .font(.system(size: 20, weight: .semibold))
-                                                    .foregroundColor(.white)
-                                            }
+                                        if viewModel.isStreaming {
+                                            ProgressView()
+                                                .scaleEffect(1.2)
+                                        } else if viewModel.isPlaying && viewModel.generationMode == .stream {
+                                            Image(systemName: "stop.fill")
+                                                .font(.system(size: 24))
+                                                .foregroundColor(.red)
+                                        } else {
+                                            Image(systemName: "antenna.radiowaves.left.and.right")
+                                                .font(.system(size: 24))
+                                                .foregroundColor(.purple)
                                         }
+
                                         Text(viewModel.isStreaming ? "Streaming" : (viewModel.isPlaying && viewModel.generationMode == .stream ? "Stop" : "Stream"))
-                                            .font(.system(size: 11, weight: .medium))
-                                            .foregroundColor(.white.opacity(0.95))
+                                            .font(.system(size: 13, weight: .medium))
+                                            .foregroundStyle(.primary)
                                     }
                                     .frame(maxWidth: .infinity)
                                     .frame(height: 80)
                                     .background(
-                                        RoundedRectangle(cornerRadius: 16)
-                                            .fill(
-                                                LinearGradient(
-                                                    gradient: Gradient(colors: (viewModel.isPlaying && viewModel.generationMode == .stream) ? [
-                                                        Color(red: 0.9, green: 0.3, blue: 0.3),
-                                                        Color(red: 0.8, green: 0.2, blue: 0.25)
-                                                    ] : [
-                                                        Color(red: 0.6, green: 0.3, blue: 0.9),
-                                                        Color(red: 0.5, green: 0.25, blue: 0.85)
-                                                    ]),
-                                                    startPoint: .topLeading,
-                                                    endPoint: .bottomTrailing
-                                                )
-                                            )
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .fill(Color(.secondarySystemBackground))
                                     )
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 16)
-                                            .stroke(
-                                                LinearGradient(
-                                                    gradient: Gradient(colors: [
-                                                        Color.white.opacity(0.3),
-                                                        Color.white.opacity(0.1)
-                                                    ]),
-                                                    startPoint: .topLeading,
-                                                    endPoint: .bottomTrailing
-                                                ),
-                                                lineWidth: 1
-                                            )
-                                    )
-                                    .shadow(color: (viewModel.isPlaying && viewModel.generationMode == .stream) ? Color.red.opacity(0.4) : Color(red: 0.6, green: 0.3, blue: 0.9).opacity(0.4), radius: 8, x: 0, y: 4)
                                 }
                                 .disabled(viewModel.isPreWarming || viewModel.isGenerating || inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                                 .opacity((viewModel.isPreWarming || viewModel.isGenerating || inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) ? 0.5 : 1.0)
-                                .scaleEffect((viewModel.isPreWarming || viewModel.isGenerating || inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) ? 0.95 : 1.0)
                                 .animation(.easeInOut(duration: 0.2), value: viewModel.isStreaming)
+                                .animation(.easeInOut(duration: 0.2), value: viewModel.isPlaying)
                                 
                                 // Play button
                                 Button(action: {
                                     viewModel.playAudio()
                                 }) {
                                     VStack(spacing: 8) {
-                                        ZStack {
-                                            Circle()
-                                                .fill(
-                                                    LinearGradient(
-                                                        gradient: Gradient(colors: [
-                                                            Color(red: 0.3, green: 0.9, blue: 0.6).opacity(0.3),
-                                                            Color(red: 0.2, green: 0.8, blue: 0.5).opacity(0.1)
-                                                        ]),
-                                                        startPoint: .topLeading,
-                                                        endPoint: .bottomTrailing
-                                                    )
-                                                )
-                                                .frame(width: 44, height: 44)
-                                            
-                                            Image(systemName: viewModel.isPlaying && viewModel.generationMode == .file ? "stop.fill" : "play.fill")
-                                                .font(.system(size: 20, weight: .semibold))
-                                                .foregroundColor(.white)
-                                        }
+                                        Image(systemName: viewModel.isPlaying && viewModel.generationMode == .file ? "stop.fill" : "play.fill")
+                                            .font(.system(size: 24))
+                                            .foregroundColor(viewModel.isPlaying && viewModel.generationMode == .file ? .red : .green)
+
                                         Text(viewModel.isPlaying && viewModel.generationMode == .file ? "Stop" : "Play")
-                                            .font(.system(size: 11, weight: .medium))
-                                            .foregroundColor(.white.opacity(0.95))
+                                            .font(.system(size: 13, weight: .medium))
+                                            .foregroundStyle(.primary)
                                     }
                                     .frame(maxWidth: .infinity)
                                     .frame(height: 80)
                                     .background(
-                                        RoundedRectangle(cornerRadius: 16)
-                                            .fill(
-                                                LinearGradient(
-                                                    gradient: Gradient(colors: (viewModel.isPlaying && viewModel.generationMode == .file) ? [
-                                                        Color(red: 0.9, green: 0.3, blue: 0.3),
-                                                        Color(red: 0.8, green: 0.2, blue: 0.25)
-                                                    ] : [
-                                                        Color(red: 0.3, green: 0.8, blue: 0.5),
-                                                        Color(red: 0.25, green: 0.75, blue: 0.45)
-                                                    ]),
-                                                    startPoint: .topLeading,
-                                                    endPoint: .bottomTrailing
-                                                )
-                                            )
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .fill(Color(.secondarySystemBackground))
                                     )
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 16)
-                                            .stroke(
-                                                LinearGradient(
-                                                    gradient: Gradient(colors: [
-                                                        Color.white.opacity(0.3),
-                                                        Color.white.opacity(0.1)
-                                                    ]),
-                                                    startPoint: .topLeading,
-                                                    endPoint: .bottomTrailing
-                                                ),
-                                                lineWidth: 1
-                                            )
-                                    )
-                                    .shadow(color: (viewModel.isPlaying && viewModel.generationMode == .file) ? Color.red.opacity(0.4) : Color.green.opacity(0.4), radius: 8, x: 0, y: 4)
                                 }
                                 .disabled(!viewModel.hasGeneratedAudio || viewModel.isPreWarming || viewModel.isGenerating || viewModel.isStreaming || viewModel.generationMode != .file)
                                 .opacity((!viewModel.hasGeneratedAudio || viewModel.isPreWarming || viewModel.isGenerating || viewModel.isStreaming || viewModel.generationMode != .file) ? 0.5 : 1.0)
-                                .scaleEffect((!viewModel.hasGeneratedAudio || viewModel.isPreWarming || viewModel.isGenerating || viewModel.isStreaming || viewModel.generationMode != .file) ? 0.95 : 1.0)
                                 .animation(.easeInOut(duration: 0.2), value: viewModel.isPlaying)
                             }
                             .padding(.horizontal)
@@ -385,40 +219,40 @@ struct ContentView: View {
                             if let errorMessage = viewModel.errorMessage {
                                 HStack {
                                     Image(systemName: "exclamationmark.triangle.fill")
-                                        .foregroundColor(.yellow)
+                                        .foregroundColor(.red)
                                     Text(errorMessage)
                                         .font(.caption)
-                                        .foregroundColor(.white)
+                                        .foregroundStyle(.primary)
                                 }
                                 .padding(12)
-                                .background(Color.red.opacity(0.8))
+                                .background(Color.red.opacity(0.1))
                                 .cornerRadius(8)
                                 .padding(.horizontal)
                             }
-                            
+
                             if viewModel.statusMessage != nil {
                                 VStack(spacing: 8) {
                                     HStack {
                                         Image(systemName: "info.circle.fill")
-                                            .foregroundColor(.white.opacity(0.8))
+                                            .foregroundColor(.blue)
                                         Text(viewModel.statusMessage ?? "")
                                             .font(.caption)
-                                            .foregroundColor(.white.opacity(0.9))
+                                            .foregroundStyle(.primary)
                                     }
-                                    
+
                                     if viewModel.chunksGenerated > 0 {
                                         HStack(spacing: 4) {
                                             Image(systemName: "square.stack.3d.down.forward.fill")
                                                 .font(.caption)
-                                                .foregroundColor(.white.opacity(0.7))
+                                                .foregroundStyle(.secondary)
                                             Text("Chunk \(viewModel.chunksGenerated)")
                                                 .font(.caption.monospacedDigit())
-                                                .foregroundColor(.white.opacity(0.8))
+                                                .foregroundStyle(.secondary)
                                         }
                                     }
                                 }
                                 .padding(12)
-                                .background(Color.white.opacity(0.2))
+                                .background(Color(.tertiarySystemBackground))
                                 .cornerRadius(8)
                                 .padding(.horizontal)
                             }
@@ -428,73 +262,73 @@ struct ContentView: View {
                                     HStack {
                                         Label("Metrics", systemImage: "chart.bar.fill")
                                             .font(.headline)
-                                            .foregroundColor(.white.opacity(0.9))
+                                            .foregroundStyle(.primary)
                                         Spacer()
                                     }
-                                    
+
                                     VStack(alignment: .leading, spacing: 6) {
                                         HStack {
                                             Image(systemName: "music.note")
-                                                .foregroundColor(.white.opacity(0.7))
+                                                .foregroundStyle(.secondary)
                                                 .frame(width: 20)
                                             Text("Audio Duration:")
                                                 .font(.caption)
-                                                .foregroundColor(.white.opacity(0.8))
+                                                .foregroundStyle(.secondary)
                                             Spacer()
                                             Text(String(format: "%.2f seconds", viewModel.audioDuration))
                                                 .font(.caption.monospacedDigit())
-                                                .foregroundColor(.white)
+                                                .foregroundStyle(.primary)
                                         }
-                                        
+
                                         HStack {
                                             Image(systemName: "bolt.badge.clock")
-                                                .foregroundColor(.white.opacity(0.7))
+                                                .foregroundStyle(.secondary)
                                                 .frame(width: 20)
                                             Text("Model Init Time:")
                                                 .font(.caption)
-                                                .foregroundColor(.white.opacity(0.8))
+                                                .foregroundStyle(.secondary)
                                             Spacer()
                                             Text(String(format: "%.2f seconds", viewModel.modelInitTime))
                                                 .font(.caption.monospacedDigit())
-                                                .foregroundColor(.white)
+                                                .foregroundStyle(.primary)
                                         }
 
                                         if let warmDuration = viewModel.lastPreWarmDuration {
                                             HStack {
                                                 Image(systemName: "flame")
-                                                    .foregroundColor(.white.opacity(0.7))
+                                                    .foregroundStyle(.secondary)
                                                     .frame(width: 20)
                                                 Text("Last Pre-Warm:")
                                                     .font(.caption)
-                                                    .foregroundColor(.white.opacity(0.8))
+                                                    .foregroundStyle(.secondary)
                                                 Spacer()
                                                 Text(String(format: "%.2f seconds", warmDuration))
                                                     .font(.caption.monospacedDigit())
-                                                    .foregroundColor(.white)
+                                                    .foregroundStyle(.primary)
                                             }
                                         }
-                                        
+
                                         HStack {
                                             Image(systemName: "timer")
-                                                .foregroundColor(.white.opacity(0.7))
+                                                .foregroundStyle(.secondary)
                                                 .frame(width: 20)
                                             Text("Synthesis Time:")
                                                 .font(.caption)
-                                                .foregroundColor(.white.opacity(0.8))
+                                                .foregroundStyle(.secondary)
                                             Spacer()
                                             Text(String(format: "%.2f seconds", viewModel.generationTime))
                                                 .font(.caption.monospacedDigit())
-                                                .foregroundColor(.white)
+                                                .foregroundStyle(.primary)
                                         }
-                                        
+
                                         if viewModel.generationMode == .file {
                                             HStack {
                                                 Image(systemName: "speedometer")
-                                                    .foregroundColor(.white.opacity(0.7))
+                                                    .foregroundStyle(.secondary)
                                                     .frame(width: 20)
                                                 Text("RTF (Real-Time Factor):")
                                                     .font(.caption)
-                                                    .foregroundColor(.white.opacity(0.8))
+                                                    .foregroundStyle(.secondary)
                                                 Spacer()
                                                 Text(String(format: "%.2fx", viewModel.rtf))
                                                     .font(.caption.monospacedDigit().bold())
@@ -503,11 +337,11 @@ struct ContentView: View {
                                         } else if viewModel.generationMode == .stream {
                                             HStack {
                                                 Image(systemName: "timer.circle.fill")
-                                                    .foregroundColor(.white.opacity(0.7))
+                                                    .foregroundStyle(.secondary)
                                                     .frame(width: 20)
                                                 Text("Time to First Audio:")
                                                     .font(.caption)
-                                                    .foregroundColor(.white.opacity(0.8))
+                                                    .foregroundStyle(.secondary)
                                                 Spacer()
                                                 Text(String(format: "%.2f seconds", viewModel.timeToFirstAudio))
                                                     .font(.caption.monospacedDigit().bold())
@@ -516,7 +350,7 @@ struct ContentView: View {
                                         }
                                     }
                                     .padding(12)
-                                    .background(Color.black.opacity(0.3))
+                                    .background(Color(.tertiarySystemBackground))
                                     .cornerRadius(8)
                                 }
                                 .padding(.horizontal)
@@ -665,6 +499,37 @@ struct Speaker: Identifiable {
         guard name.count >= 2 else { return name }
         let cleanName = name.dropFirst(3).capitalized
         return "\(cleanName)"
+    }
+
+    var isFemale: Bool {
+        guard name.count >= 2 else { return false }
+        return name.prefix(2).hasSuffix("f")
+    }
+
+    var genderIcon: String {
+        isFemale ? "person.fill" : "person.fill"
+    }
+
+    var accentColor: Color {
+        isFemale ? .pink : .blue
+    }
+
+    var languageName: String {
+        guard name.count >= 1 else { return "Other" }
+        let prefix = String(name.prefix(1))
+
+        switch prefix {
+        case "a": return "American"
+        case "b": return "British"
+        case "e": return "Spanish"
+        case "f": return "French"
+        case "h": return "Hindi"
+        case "i": return "Italian"
+        case "j": return "Japanese"
+        case "p": return "Portuguese"
+        case "z": return "Chinese"
+        default: return "Other"
+        }
     }
 }
 

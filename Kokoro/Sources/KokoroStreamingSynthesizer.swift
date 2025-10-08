@@ -6,17 +6,20 @@ class KokoroStreamingSynthesizer {
     static func synthesizeStreaming(
         text: String,
         voice: String = "af_heart",
+        ttsManager: TtSManager,
         onInitComplete: ((TimeInterval) -> Void)? = nil,
         onChunkGenerated: @escaping (Data) async -> Void
     ) async throws {
         // Measure model initialization (downloads + CoreML load)
-        let initStart = Date()
-        try await KokoroSynthesizer.ensureRequiredFiles()
-        try await KokoroSynthesizer.loadModel()
-        let initDuration = Date().timeIntervalSince(initStart)
+        var initDuration: TimeInterval = 0
+        if !ttsManager.isAvailable {
+            let initStart = Date()
+            try await ttsManager.initialize()
+            initDuration = Date().timeIntervalSince(initStart)
+        }
         onInitComplete?(initDuration)
 
-        let synthesis = try await KokoroSynthesizer.synthesizeDetailed(text: text, voice: voice)
+        let synthesis = try await ttsManager.synthesizeDetailed(text: text, voice: voice)
         let chunks = synthesis.chunks
 
         guard !chunks.isEmpty else {

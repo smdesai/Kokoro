@@ -67,7 +67,7 @@ class TTSViewModel: ObservableObject {
                 try await ttsManager.initialize()
             }
 
-            try await ttsManager.preWarm(variant: variant)
+//            try await ttsManager.preWarm(variant: variant)
 
             let duration = Date().timeIntervalSince(warmStart)
 
@@ -118,14 +118,19 @@ class TTSViewModel: ObservableObject {
                 self.statusMessage = "Loading Kokoro model and resources..."
             }
 
-            try await KokoroSynthesizer.ensureRequiredFiles()
-            try await KokoroSynthesizer.loadModel()
-            
+            var initDuration: TimeInterval = 0
+            if !ttsManager.isAvailable {
+                let initStart = Date()
+                try await ttsManager.initialize()
+                initDuration = Date().timeIntervalSince(initStart)
+            }
+
             await MainActor.run {
+                self.modelInitTime = initDuration
                 self.statusMessage = "Generating speech..."
             }
 
-            let audioData = try await KokoroSynthesizer.synthesize(text: text, voice: voice)
+            let audioData = try await ttsManager.synthesize(text: text, voice: voice)
 
             let generationEndTime = Date()
             let totalGenerationTime = generationEndTime.timeIntervalSince(startTime)
@@ -205,6 +210,7 @@ class TTSViewModel: ObservableObject {
             try await KokoroStreamingSynthesizer.synthesizeStreaming(
                 text: text,
                 voice: voice,
+                ttsManager: ttsManager,
                 onInitComplete: { [weak self] initDuration in
                     guard let self = self else { return }
                     Task { @MainActor in
