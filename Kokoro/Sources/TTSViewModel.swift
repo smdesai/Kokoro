@@ -2,6 +2,12 @@ import Foundation
 import AVFoundation
 import FluidAudio
 import Combine
+#if canImport(UIKit)
+import UIKit
+#endif
+#if canImport(UserNotifications)
+import UserNotifications
+#endif
 
 @MainActor
 class TTSViewModel: ObservableObject {
@@ -37,6 +43,9 @@ class TTSViewModel: ObservableObject {
     private var generationEndTime: Date?
     private var firstChunkTime: Date?
     private let ttsManager = TtSManager()
+#if canImport(UIKit)
+    private var backgroundTaskIdentifier: UIBackgroundTaskIdentifier = .invalid
+#endif
 
     init() {
         setupAudioSession()
@@ -49,6 +58,102 @@ class TTSViewModel: ObservableObject {
         } catch {
             print("Failed to setup audio session: \(error)")
         }
+    }
+
+    private func beginBackgroundTask(named name: String) {
+#if canImport(UIKit)
+        endBackgroundTask()
+        backgroundTaskIdentifier = UIApplication.shared.beginBackgroundTask(withName: name) { [weak self] in
+            guard let self else { return }
+            Task { @MainActor in
+                self.handleBackgroundTaskExpiration()
+            }
+        }
+#endif
+    }
+
+    private func endBackgroundTask() {
+#if canImport(UIKit)
+        guard backgroundTaskIdentifier != .invalid else { return }
+        UIApplication.shared.endBackgroundTask(backgroundTaskIdentifier)
+        backgroundTaskIdentifier = .invalid
+#endif
+    }
+
+#if canImport(UIKit)
+    private func handleBackgroundTaskExpiration() {
+        if generationMode == .stream {
+            streamingPlayer?.stopPlayback()
+        } else {
+            audioPlayer?.stop()
+        }
+        statusMessage = nil
+        errorMessage = "Background execution time expired."
+        isGenerating = false
+        isStreaming = false
+        isPlaying = false
+        generationMode = .none
+        endBackgroundTask()
+    }
+#endif
+
+#if canImport(UserNotifications)
+    private func requestNotificationAuthorizationIfNeeded() {
+        let center = UNUserNotificationCenter.current()
+        center.getNotificationSettings { settings in
+            guard settings.authorizationStatus == .notDetermined else { return }
+            center.requestAuthorization(options: [.alert, .sound]) { _, error in
+                if let error {
+                    print("Notification authorization request failed: \(error)")
+                }
+            }
+        }
+    }
+#endif
+
+#if canImport(UIKit) && canImport(UserNotifications)
+    private func notifyCompletionIfBackground(for mode: GenerationMode) {
+        guard UIApplication.shared.applicationState != .active else { return }
+
+        let center = UNUserNotificationCenter.current()
+        let content = UNMutableNotificationContent()
+        content.title = "Kokoro Audio Ready"
+        switch mode {
+        case .file:
+            content.body = "Your generated audio file is ready to play."
+        case .stream:
+            content.body = "Audio generation finished. Playback continues."
+        case .none:
+            content.body = "Audio generation has finished."
+        }
+        content.sound = .default
+
+        let request = UNNotificationRequest(
+            identifier: "kokoro.tts.complete.\(UUID().uuidString)",
+            content: content,
+            trigger: nil
+        )
+
+        center.add(request) { error in
+            if let error {
+                print("Failed to schedule completion notification: \(error)")
+            }
+        }
+    }
+#endif
+
+    func clearDisplayedResults() {
+        statusMessage = nil
+        errorMessage = nil
+        hasGeneratedAudio = false
+        audioDuration = 0.0
+        generationTime = 0.0
+        modelInitTime = 0.0
+        rtf = 0.0
+        timeToFirstAudio = 0.0
+        chunksGenerated = 0
+        totalChunks = 0
+        generationMode = .none
     }
 
     func preWarm(variant: ModelNames.TTS.Variant? = nil) async {
@@ -111,6 +216,13 @@ class TTSViewModel: ObservableObject {
             self.generationMode = .file
         }
 
+#if canImport(UserNotifications)
+        requestNotificationAuthorizationIfNeeded()
+#endif
+
+        beginBackgroundTask(named: "TTSFileGeneration")
+        defer { endBackgroundTask() }
+
         let startTime = Date()
 
         do {
@@ -156,6 +268,9 @@ class TTSViewModel: ObservableObject {
                 self.generationTime = totalGenerationTime
                 self.rtf = rtfValue
                 self.statusMessage = "Audio file generated successfully!"
+#if canImport(UIKit) && canImport(UserNotifications)
+                self.notifyCompletionIfBackground(for: .file)
+#endif
             }
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
@@ -192,6 +307,13 @@ class TTSViewModel: ObservableObject {
             self.totalChunks = 0
             self.generationMode = .stream
         }
+
+#if canImport(UserNotifications)
+        requestNotificationAuthorizationIfNeeded()
+#endif
+
+        beginBackgroundTask(named: "TTSStreaming")
+        defer { endBackgroundTask() }
 
         generationStartTime = nil
         generationEndTime = nil
@@ -253,6 +375,9 @@ class TTSViewModel: ObservableObject {
                 self.isStreaming = false
                 self.statusMessage = "Audio streaming complete"
                 self.updateMetrics()
+#if canImport(UIKit) && canImport(UserNotifications)
+                self.notifyCompletionIfBackground(for: .stream)
+#endif
             }
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
@@ -322,6 +447,8 @@ class TTSViewModel: ObservableObject {
         isPlaying = false
         isStreaming = false
         statusMessage = "Playback stopped"
+
+        endBackgroundTask()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
             if self?.statusMessage == "Playback stopped" {

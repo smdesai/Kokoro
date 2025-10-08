@@ -34,6 +34,7 @@ struct ContentView: View {
                                 if !inputText.isEmpty {
                                     Button(action: {
                                         inputText = ""
+                                        viewModel.clearDisplayedResults()
                                     }) {
                                         HStack(spacing: 4) {
                                             Image(systemName: "xmark.circle.fill")
