@@ -1,5 +1,6 @@
 import Foundation
 import FluidAudio
+import SegmentTextKit
 
 @available(iOS 16.0, *)
 class KokoroStreamingSynthesizer {

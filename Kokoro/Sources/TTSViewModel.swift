@@ -1,6 +1,7 @@
 import Foundation
 import AVFoundation
 import FluidAudio
+import SegmentTextKit
 import Combine
 #if canImport(UIKit)
 import UIKit
@@ -43,6 +44,11 @@ class TTSViewModel: ObservableObject {
     private var generationEndTime: Date?
     private var firstChunkTime: Date?
     private let ttsManager = TtSManager()
+    private var streamingSplitter: StreamingSentenceSplitter?
+    private var streamingChunksVoice: String?
+    private var streamingChunksReportedInit = false
+    private var streamingChunksStartedPlayback = false
+    private var streamingChunksProducedAudio = false
 #if canImport(UIKit)
     private var backgroundTaskIdentifier: UIBackgroundTaskIdentifier = .invalid
 #endif
@@ -55,6 +61,13 @@ class TTSViewModel: ObservableObject {
         do {
             try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
             try AVAudioSession.sharedInstance().setActive(true)
+            let splitter = try SentenceSplitter()
+            streamingSplitter = StreamingSentenceSplitter(
+                splitter: splitter,
+                threshold: 0.2,
+                stripWhitespace: true,
+                delay: 100
+            )
         } catch {
             print("Failed to setup audio session: \(error)")
         }
@@ -396,6 +409,235 @@ class TTSViewModel: ObservableObject {
         }
     }
 
+    func streamTextChunks(_ text: String, voice: String) async {
+        guard let splitter = streamingSplitter else {
+            errorMessage = "Sentence splitter unavailable"
+            return
+        }
+
+        guard prepareStreamingChunksSessionIfNeeded(voice: voice) else {
+            return
+        }
+
+        guard !Task.isCancelled else {
+            streamingPlayer?.stopPlayback()
+            isStreaming = false
+            isPlaying = false
+            statusMessage = nil
+            errorMessage = "Streaming cancelled"
+            endBackgroundTask()
+            cleanupStreamingChunksSession()
+            return
+        }
+
+        do {
+            let sentences = splitter.stream(text: text)
+            for sentence in sentences {
+                try await synthesizeStreamingSentence(sentence, voice: voice)
+            }
+        } catch is CancellationError {
+            streamingPlayer?.stopPlayback()
+            isStreaming = false
+            isPlaying = false
+            statusMessage = nil
+            errorMessage = "Streaming cancelled"
+            endBackgroundTask()
+            cleanupStreamingChunksSession()
+        } catch {
+            streamingPlayer?.stopPlayback()
+            isStreaming = false
+            isPlaying = false
+            statusMessage = nil
+            errorMessage = "Failed to stream audio: \(error.localizedDescription)"
+            endBackgroundTask()
+            cleanupStreamingChunksSession()
+        }
+    }
+
+    func finishStreamingTextChunks() async {
+        guard let splitter = streamingSplitter else {
+            errorMessage = "Sentence splitter unavailable"
+            return
+        }
+
+        guard let voice = streamingChunksVoice else {
+            splitter.reset()
+            return
+        }
+
+        do {
+            let trailingSentences = splitter.finishStream()
+            for sentence in trailingSentences {
+                try await synthesizeStreamingSentence(sentence, voice: voice)
+            }
+
+            if streamingChunksProducedAudio {
+                generationEndTime = Date()
+                streamingPlayer?.finishStreaming()
+                isStreaming = false
+                statusMessage = "Audio streaming complete"
+                updateMetrics()
+#if canImport(UIKit) && canImport(UserNotifications)
+                notifyCompletionIfBackground(for: .stream)
+#endif
+
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
+                    if self?.statusMessage == "Audio streaming complete" {
+                        self?.statusMessage = nil
+                    }
+                }
+            } else {
+                streamingPlayer?.stopPlayback()
+                isStreaming = false
+                isPlaying = false
+                statusMessage = nil
+                errorMessage = "No complete sentences received for synthesis"
+            }
+        } catch is CancellationError {
+            streamingPlayer?.stopPlayback()
+            isStreaming = false
+            isPlaying = false
+            statusMessage = nil
+            errorMessage = "Streaming cancelled"
+        } catch {
+            streamingPlayer?.stopPlayback()
+            isStreaming = false
+            isPlaying = false
+            statusMessage = nil
+            errorMessage = "Failed to stream audio: \(error.localizedDescription)"
+        }
+
+        endBackgroundTask()
+        cleanupStreamingChunksSession()
+    }
+
+    private func prepareStreamingChunksSessionIfNeeded(voice: String) -> Bool {
+        if let currentVoice = streamingChunksVoice {
+            if currentVoice != voice {
+                errorMessage = "Streaming already in progress with a different voice"
+                return false
+            }
+            return true
+        }
+
+        guard streamingSplitter != nil else {
+            errorMessage = "Sentence splitter unavailable"
+            return false
+        }
+
+        streamingSplitter?.reset()
+
+        streamingChunksVoice = voice
+        streamingChunksReportedInit = false
+        streamingChunksStartedPlayback = false
+        streamingChunksProducedAudio = false
+
+        isStreaming = true
+        isPlaying = true
+        errorMessage = nil
+        statusMessage = "Initializing TTS model..."
+        audioDuration = 0.0
+        generationTime = 0.0
+        modelInitTime = 0.0
+        timeToFirstAudio = 0.0
+        chunksGenerated = 0
+        totalChunks = 0
+        generationMode = .stream
+
+#if canImport(UserNotifications)
+        requestNotificationAuthorizationIfNeeded()
+#endif
+
+        beginBackgroundTask(named: "TTSStreaming")
+
+        generationStartTime = nil
+        generationEndTime = nil
+        firstChunkTime = nil
+        streamingPlayer?.stopPlayback()
+        streamingPlayer = StreamingAudioPlayer()
+
+        return true
+    }
+
+    private func cleanupStreamingChunksSession() {
+        streamingChunksVoice = nil
+        streamingChunksReportedInit = false
+        streamingChunksStartedPlayback = false
+        streamingChunksProducedAudio = false
+        streamingSplitter?.reset()
+    }
+
+    private func synthesizeStreamingSentence(_ sentence: String, voice: String) async throws {
+        let trimmed = sentence.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+
+        if generationStartTime == nil {
+            generationStartTime = Date()
+            statusMessage = "Loading Kokoro model and resources..."
+        }
+
+        try await KokoroStreamingSynthesizer.synthesizeStreaming(
+            text: trimmed,
+            voice: voice,
+            ttsManager: ttsManager,
+            onInitComplete: { [weak self] initDuration in
+                guard let self else { return }
+                Task { @MainActor in
+                    if !self.streamingChunksReportedInit {
+                        self.streamingChunksReportedInit = true
+                        self.modelInitTime = initDuration
+                        self.updateMetrics()
+                    }
+                }
+            }
+        ) { [weak self] chunkData in
+            guard let self else { return }
+
+            await MainActor.run {
+                self.chunksGenerated += 1
+                self.statusMessage = "Generating chunk \(self.chunksGenerated)..."
+
+                if !self.streamingChunksStartedPlayback {
+                    self.streamingChunksStartedPlayback = true
+                    self.firstChunkTime = Date()
+                    if let startTime = self.generationStartTime,
+                       let firstChunkTime = self.firstChunkTime
+                    {
+                        self.timeToFirstAudio = firstChunkTime.timeIntervalSince(startTime)
+                    }
+                    self.streamingPlayer?.startPlayback { [weak self] in
+                        DispatchQueue.main.async {
+                            self?.isPlaying = false
+                            self?.updateMetrics()
+                        }
+                    }
+                }
+
+                self.streamingPlayer?.enqueueAudioData(chunkData)
+                self.hasGeneratedAudio = true
+                self.streamingChunksProducedAudio = true
+            }
+        }
+    }
+
+    public func emulateStreamingText(_ sentence: String, voice: String) async throws {
+        var currentIndex = sentence.startIndex
+        while currentIndex < sentence.endIndex {
+            let chunkSize = Int.random(in: 5 ... 20)
+            let endIndex =
+                sentence.index(currentIndex, offsetBy: chunkSize, limitedBy: sentence.endIndex)
+                    ?? sentence.endIndex
+            let chunk = String(sentence[currentIndex ..< endIndex])
+            print("chunk: \(chunk)")
+            await streamTextChunks(chunk, voice: voice)
+            currentIndex = endIndex
+
+            try? await Task.sleep(nanoseconds: 100 * 1_000_000) // 100ms
+        }
+
+        await finishStreamingTextChunks()
+    }
+
     private func updateMetrics() {
         guard let startTime = generationStartTime else { return }
 
@@ -449,6 +691,7 @@ class TTSViewModel: ObservableObject {
         statusMessage = "Playback stopped"
 
         endBackgroundTask()
+        cleanupStreamingChunksSession()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
             if self?.statusMessage == "Playback stopped" {

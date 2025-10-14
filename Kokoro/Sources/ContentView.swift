@@ -158,6 +158,7 @@ struct ContentView: View {
                                         Task {
                                             let speaker = speakerModel.getSpeaker().first!
                                             await viewModel.streamAudio(from: inputText, voice: speaker.name)
+//                                            try await viewModel.emulateStreamingText(inputText, voice: speaker.name)
                                         }
                                     }
                                 }) {
