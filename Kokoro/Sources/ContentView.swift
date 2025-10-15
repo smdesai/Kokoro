@@ -1,9 +1,10 @@
-import SwiftUI
 import AVFoundation
+import SwiftUI
 
 struct ContentView: View {
     @StateObject private var viewModel = TTSViewModel()
-    @State private var inputText: String = "This is the [Kokoro](/kˈOkəɹO/) TTS model. It supports the [Misaki](/misˈɑki/) [G2P](G to P) engine for better currency, time and number support. Here are some examples. The item costs $5.23. The current time is 2:30 and the value of pi is 3.14 to 2 decimal places. It also supports alias replacement so things like [Dr.](Doctor) sound better and direct phonetic replacement as in, you say [tomato](/təmˈɑːtQ/), I say [tomato](/təmˈAɾO/)."
+    @State private var inputText: String =
+        "This is the [Kokoro](/kˈOkəɹO/) TTS model. It supports the [Misaki](/misˈɑki/) [G2P](G to P) engine for better currency, time and number support. Here are some examples. The item costs $5.23. The current time is 2:30 and the value of pi is 3.14 to 2 decimal places. It also supports alias replacement so things like [Dr.](Doctor) sound better and direct phonetic replacement as in, you say [tomato](/təmˈɑːtQ/), I say [tomato](/təmˈAɾO/)."
 
     @FocusState private var isTextFieldFocused: Bool
     @State private var keyboardHeight: CGFloat = 0
@@ -72,54 +73,54 @@ struct ContentView: View {
                         }
                         .padding(.horizontal)
 
-//                        Button(action: {
-//                            if !viewModel.isPreWarming {
-//                                Task {
-//                                    await viewModel.preWarm()
-//                                }
-//                            }
-//                        }) {
-//                            HStack(spacing: 16) {
-//                                ZStack {
-//                                    Circle()
-//                                        .fill(Color(.tertiarySystemBackground))
-//                                        .frame(width: 44, height: 44)
-//
-//                                    if viewModel.isPreWarming {
-//                                        ProgressView()
-//                                            .scaleEffect(0.8)
-//                                    } else {
-//                                        Image(systemName: "flame.fill")
-//                                            .font(.system(size: 20, weight: .semibold))
-//                                            .foregroundColor(.orange)
-//                                    }
-//                                }
-//
-//                                VStack(alignment: .leading, spacing: 4) {
-//                                    Text(viewModel.isPreWarming ? "Pre-warming..." : "Pre-warm Engine")
-//                                        .font(.system(size: 16, weight: .semibold))
-//                                        .foregroundStyle(.primary)
-//
-//                                    if let warmDuration = viewModel.lastPreWarmDuration {
-//                                        Text(String(format: "Last ready in %.2f seconds", warmDuration))
-//                                            .font(.caption)
-//                                            .foregroundStyle(.secondary)
-//                                    } else {
-//                                        Text("Prepare models for instant playback")
-//                                            .font(.caption)
-//                                            .foregroundStyle(.secondary)
-//                                    }
-//                                }
-//
-//                                Spacer()
-//                            }
-//                            .padding(.vertical, 14)
-//                            .padding(.horizontal, 20)
-//                            .background(
-//                                RoundedRectangle(cornerRadius: 12)
-//                                    .fill(Color(.secondarySystemBackground))
-//                            )
-//                        }
+                        //                        Button(action: {
+                        //                            if !viewModel.isPreWarming {
+                        //                                Task {
+                        //                                    await viewModel.preWarm()
+                        //                                }
+                        //                            }
+                        //                        }) {
+                        //                            HStack(spacing: 16) {
+                        //                                ZStack {
+                        //                                    Circle()
+                        //                                        .fill(Color(.tertiarySystemBackground))
+                        //                                        .frame(width: 44, height: 44)
+                        //
+                        //                                    if viewModel.isPreWarming {
+                        //                                        ProgressView()
+                        //                                            .scaleEffect(0.8)
+                        //                                    } else {
+                        //                                        Image(systemName: "flame.fill")
+                        //                                            .font(.system(size: 20, weight: .semibold))
+                        //                                            .foregroundColor(.orange)
+                        //                                    }
+                        //                                }
+                        //
+                        //                                VStack(alignment: .leading, spacing: 4) {
+                        //                                    Text(viewModel.isPreWarming ? "Pre-warming..." : "Pre-warm Engine")
+                        //                                        .font(.system(size: 16, weight: .semibold))
+                        //                                        .foregroundStyle(.primary)
+                        //
+                        //                                    if let warmDuration = viewModel.lastPreWarmDuration {
+                        //                                        Text(String(format: "Last ready in %.2f seconds", warmDuration))
+                        //                                            .font(.caption)
+                        //                                            .foregroundStyle(.secondary)
+                        //                                    } else {
+                        //                                        Text("Prepare models for instant playback")
+                        //                                            .font(.caption)
+                        //                                            .foregroundStyle(.secondary)
+                        //                                    }
+                        //                                }
+                        //
+                        //                                Spacer()
+                        //                            }
+                        //                            .padding(.vertical, 14)
+                        //                            .padding(.horizontal, 20)
+                        //                            .background(
+                        //                                RoundedRectangle(cornerRadius: 12)
+                        //                                    .fill(Color(.secondarySystemBackground))
+                        //                            )
+                        //                        }
 
                         VStack(spacing: 16) {
                             HStack(spacing: 12) {
@@ -127,7 +128,8 @@ struct ContentView: View {
                                 Button(action: {
                                     Task {
                                         let speaker = speakerModel.getSpeaker().first!
-                                        await viewModel.generateFile(from: inputText, voice: speaker.name)
+                                        await viewModel.generateFile(
+                                            from: inputText, voice: speaker.name)
                                     }
                                 }) {
                                     VStack(spacing: 8) {
@@ -146,19 +148,34 @@ struct ContentView: View {
                                             .fill(Color(.secondarySystemBackground))
                                     )
                                 }
-                                .disabled(viewModel.isPreWarming || viewModel.isGenerating || viewModel.isStreaming || inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                                .opacity((viewModel.isPreWarming || viewModel.isGenerating || viewModel.isStreaming || inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) ? 0.5 : 1.0)
+                                .disabled(
+                                    viewModel.isPreWarming || viewModel.isGenerating
+                                        || viewModel.isStreaming
+                                        || inputText.trimmingCharacters(in: .whitespacesAndNewlines)
+                                            .isEmpty
+                                )
+                                .opacity(
+                                    (viewModel.isPreWarming || viewModel.isGenerating
+                                        || viewModel.isStreaming
+                                        || inputText.trimmingCharacters(in: .whitespacesAndNewlines)
+                                            .isEmpty)
+                                        ? 0.5 : 1.0
+                                )
                                 .animation(.easeInOut(duration: 0.2), value: viewModel.isGenerating)
-                                
+
                                 // Stream button
                                 Button(action: {
-                                    if viewModel.isStreaming || (viewModel.isPlaying && viewModel.generationMode == .stream) {
+                                    if viewModel.isStreaming
+                                        || (viewModel.isPlaying
+                                            && viewModel.generationMode == .stream)
+                                    {
                                         viewModel.stopPlayback()
                                     } else {
                                         Task {
                                             let speaker = speakerModel.getSpeaker().first!
-                                            await viewModel.streamAudio(from: inputText, voice: speaker.name)
-//                                            try await viewModel.emulateStreamingText(inputText, voice: speaker.name)
+                                            //                                            await viewModel.streamAudio(from: inputText, voice: speaker.name)
+                                            try await viewModel.emulateStreamingText(
+                                                inputText, voice: speaker.name)
                                         }
                                     }
                                 }) {
@@ -166,7 +183,9 @@ struct ContentView: View {
                                         if viewModel.isStreaming {
                                             ProgressView()
                                                 .scaleEffect(1.2)
-                                        } else if viewModel.isPlaying && viewModel.generationMode == .stream {
+                                        } else if viewModel.isPlaying
+                                            && viewModel.generationMode == .stream
+                                        {
                                             Image(systemName: "stop.fill")
                                                 .font(.system(size: 24))
                                                 .foregroundColor(.red)
@@ -176,9 +195,15 @@ struct ContentView: View {
                                                 .foregroundColor(.purple)
                                         }
 
-                                        Text(viewModel.isStreaming ? "Streaming" : (viewModel.isPlaying && viewModel.generationMode == .stream ? "Stop" : "Stream"))
-                                            .font(.system(size: 13, weight: .medium))
-                                            .foregroundStyle(.primary)
+                                        Text(
+                                            viewModel.isStreaming
+                                                ? "Streaming"
+                                                : (viewModel.isPlaying
+                                                    && viewModel.generationMode == .stream
+                                                    ? "Stop" : "Stream")
+                                        )
+                                        .font(.system(size: 13, weight: .medium))
+                                        .foregroundStyle(.primary)
                                     }
                                     .frame(maxWidth: .infinity)
                                     .frame(height: 80)
@@ -187,23 +212,41 @@ struct ContentView: View {
                                             .fill(Color(.secondarySystemBackground))
                                     )
                                 }
-                                .disabled(viewModel.isPreWarming || viewModel.isGenerating || inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                                .opacity((viewModel.isPreWarming || viewModel.isGenerating || inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) ? 0.5 : 1.0)
+                                .disabled(
+                                    viewModel.isPreWarming || viewModel.isGenerating
+                                        || inputText.trimmingCharacters(in: .whitespacesAndNewlines)
+                                            .isEmpty
+                                )
+                                .opacity(
+                                    (viewModel.isPreWarming || viewModel.isGenerating
+                                        || inputText.trimmingCharacters(in: .whitespacesAndNewlines)
+                                            .isEmpty)
+                                        ? 0.5 : 1.0
+                                )
                                 .animation(.easeInOut(duration: 0.2), value: viewModel.isStreaming)
                                 .animation(.easeInOut(duration: 0.2), value: viewModel.isPlaying)
-                                
+
                                 // Play button
                                 Button(action: {
                                     viewModel.playAudio()
                                 }) {
                                     VStack(spacing: 8) {
-                                        Image(systemName: viewModel.isPlaying && viewModel.generationMode == .file ? "stop.fill" : "play.fill")
-                                            .font(.system(size: 24))
-                                            .foregroundColor(viewModel.isPlaying && viewModel.generationMode == .file ? .red : .green)
+                                        Image(
+                                            systemName: viewModel.isPlaying
+                                                && viewModel.generationMode == .file
+                                                ? "stop.fill" : "play.fill"
+                                        )
+                                        .font(.system(size: 24))
+                                        .foregroundColor(
+                                            viewModel.isPlaying && viewModel.generationMode == .file
+                                                ? .red : .green)
 
-                                        Text(viewModel.isPlaying && viewModel.generationMode == .file ? "Stop" : "Play")
-                                            .font(.system(size: 13, weight: .medium))
-                                            .foregroundStyle(.primary)
+                                        Text(
+                                            viewModel.isPlaying && viewModel.generationMode == .file
+                                                ? "Stop" : "Play"
+                                        )
+                                        .font(.system(size: 13, weight: .medium))
+                                        .foregroundStyle(.primary)
                                     }
                                     .frame(maxWidth: .infinity)
                                     .frame(height: 80)
@@ -212,12 +255,20 @@ struct ContentView: View {
                                             .fill(Color(.secondarySystemBackground))
                                     )
                                 }
-                                .disabled(!viewModel.hasGeneratedAudio || viewModel.isPreWarming || viewModel.isGenerating || viewModel.isStreaming || viewModel.generationMode != .file)
-                                .opacity((!viewModel.hasGeneratedAudio || viewModel.isPreWarming || viewModel.isGenerating || viewModel.isStreaming || viewModel.generationMode != .file) ? 0.5 : 1.0)
+                                .disabled(
+                                    !viewModel.hasGeneratedAudio || viewModel.isPreWarming
+                                        || viewModel.isGenerating || viewModel.isStreaming
+                                        || viewModel.generationMode != .file
+                                )
+                                .opacity(
+                                    (!viewModel.hasGeneratedAudio || viewModel.isPreWarming
+                                        || viewModel.isGenerating || viewModel.isStreaming
+                                        || viewModel.generationMode != .file) ? 0.5 : 1.0
+                                )
                                 .animation(.easeInOut(duration: 0.2), value: viewModel.isPlaying)
                             }
                             .padding(.horizontal)
-                            
+
                             if let errorMessage = viewModel.errorMessage {
                                 HStack {
                                     Image(systemName: "exclamationmark.triangle.fill")
@@ -258,7 +309,7 @@ struct ContentView: View {
                                 .cornerRadius(8)
                                 .padding(.horizontal)
                             }
-                            
+
                             if viewModel.hasGeneratedAudio && viewModel.audioDuration > 0 {
                                 VStack(spacing: 8) {
                                     HStack {
@@ -277,9 +328,12 @@ struct ContentView: View {
                                                 .font(.caption)
                                                 .foregroundStyle(.secondary)
                                             Spacer()
-                                            Text(String(format: "%.2f seconds", viewModel.audioDuration))
-                                                .font(.caption.monospacedDigit())
-                                                .foregroundStyle(.primary)
+                                            Text(
+                                                String(
+                                                    format: "%.2f seconds", viewModel.audioDuration)
+                                            )
+                                            .font(.caption.monospacedDigit())
+                                            .foregroundStyle(.primary)
                                         }
 
                                         HStack {
@@ -290,9 +344,12 @@ struct ContentView: View {
                                                 .font(.caption)
                                                 .foregroundStyle(.secondary)
                                             Spacer()
-                                            Text(String(format: "%.2f seconds", viewModel.modelInitTime))
-                                                .font(.caption.monospacedDigit())
-                                                .foregroundStyle(.primary)
+                                            Text(
+                                                String(
+                                                    format: "%.2f seconds", viewModel.modelInitTime)
+                                            )
+                                            .font(.caption.monospacedDigit())
+                                            .foregroundStyle(.primary)
                                         }
 
                                         if let warmDuration = viewModel.lastPreWarmDuration {
@@ -318,9 +375,13 @@ struct ContentView: View {
                                                 .font(.caption)
                                                 .foregroundStyle(.secondary)
                                             Spacer()
-                                            Text(String(format: "%.2f seconds", viewModel.generationTime))
-                                                .font(.caption.monospacedDigit())
-                                                .foregroundStyle(.primary)
+                                            Text(
+                                                String(
+                                                    format: "%.2f seconds", viewModel.generationTime
+                                                )
+                                            )
+                                            .font(.caption.monospacedDigit())
+                                            .foregroundStyle(.primary)
                                         }
 
                                         if viewModel.generationMode == .file {
@@ -334,7 +395,11 @@ struct ContentView: View {
                                                 Spacer()
                                                 Text(String(format: "%.2fx", viewModel.rtf))
                                                     .font(.caption.monospacedDigit().bold())
-                                                    .foregroundColor(viewModel.rtf > 10.0 ? .green : (viewModel.rtf > 1.0 ? .yellow : .orange))
+                                                    .foregroundColor(
+                                                        viewModel.rtf > 10.0
+                                                            ? .green
+                                                            : (viewModel.rtf > 1.0
+                                                                ? .yellow : .orange))
                                             }
                                         } else if viewModel.generationMode == .stream {
                                             HStack {
@@ -345,9 +410,17 @@ struct ContentView: View {
                                                     .font(.caption)
                                                     .foregroundStyle(.secondary)
                                                 Spacer()
-                                                Text(String(format: "%.2f seconds", viewModel.timeToFirstAudio))
-                                                    .font(.caption.monospacedDigit().bold())
-                                                    .foregroundColor(viewModel.timeToFirstAudio < 1.0 ? .green : (viewModel.timeToFirstAudio < 2.0 ? .yellow : .orange))
+                                                Text(
+                                                    String(
+                                                        format: "%.2f seconds",
+                                                        viewModel.timeToFirstAudio)
+                                                )
+                                                .font(.caption.monospacedDigit().bold())
+                                                .foregroundColor(
+                                                    viewModel.timeToFirstAudio < 1.0
+                                                        ? .green
+                                                        : (viewModel.timeToFirstAudio < 2.0
+                                                            ? .yellow : .orange))
                                             }
                                         }
                                     }
@@ -359,7 +432,7 @@ struct ContentView: View {
                                 .transition(.opacity.combined(with: .scale))
                             }
                         }
-                        
+
                         Spacer(minLength: 20)
                     }
                     .padding(.vertical)
@@ -373,13 +446,19 @@ struct ContentView: View {
                 isTextFieldFocused = false
             }
             .onAppear {
-                NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { notification in
-                    if let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
+                NotificationCenter.default.addObserver(
+                    forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main
+                ) { notification in
+                    if let keyboardFrame = notification.userInfo?[
+                        UIResponder.keyboardFrameEndUserInfoKey] as? CGRect
+                    {
                         keyboardHeight = keyboardFrame.height
                     }
                 }
-                
-                NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: .main) { _ in
+
+                NotificationCenter.default.addObserver(
+                    forName: UIResponder.keyboardWillHideNotification, object: nil, queue: .main
+                ) { _ in
                     keyboardHeight = 0
                 }
             }
@@ -389,7 +468,7 @@ struct ContentView: View {
         }
         .navigationViewStyle(StackNavigationViewStyle())
     }
-    
+
     // MARK: - Speaker Card
 
     private var speakerCard: some View {
@@ -466,15 +545,15 @@ struct Speaker: Identifiable {
 
         let countryFlag: String
         switch country {
-        case "a": countryFlag = "🇺🇸" // USA
-        case "b": countryFlag = "🇬🇧" // British
-        case "e": countryFlag = "🇪🇸" // Spain
-        case "f": countryFlag = "🇫🇷" // French
-        case "h": countryFlag = "🇮🇳" // Hindi
-        case "i": countryFlag = "🇮🇹" // Italian
-        case "j": countryFlag = "🇯🇵" // Japanese
-        case "p": countryFlag = "🇧🇷" // Brazil
-        case "z": countryFlag = "🇨🇳" // Chinese
+        case "a": countryFlag = "🇺🇸"  // USA
+        case "b": countryFlag = "🇬🇧"  // British
+        case "e": countryFlag = "🇪🇸"  // Spain
+        case "f": countryFlag = "🇫🇷"  // French
+        case "h": countryFlag = "🇮🇳"  // Hindi
+        case "i": countryFlag = "🇮🇹"  // Italian
+        case "j": countryFlag = "🇯🇵"  // Japanese
+        case "p": countryFlag = "🇧🇷"  // Brazil
+        case "z": countryFlag = "🇨🇳"  // Chinese
         default: countryFlag = "🏳️"
         }
 
@@ -524,8 +603,8 @@ struct Speaker: Identifiable {
 }
 
 class SpeakerViewModel: ObservableObject {
-    @Published var selectedSpeakerId: Int = 3 // Default to af_heart
-    @Published var selectedSpeakerName: String = "af_heart" // Default to af_heart
+    @Published var selectedSpeakerId: Int = 3  // Default to af_heart
+    @Published var selectedSpeakerName: String = "af_heart"  // Default to af_heart
     @Published var isGenerating: Bool = false
 
     let speakers: [Speaker] = [
@@ -584,7 +663,7 @@ class SpeakerViewModel: ObservableObject {
         Speaker(id: 52, name: "zm_yunyang"),
     ]
 
-   func getSpeaker() -> [Speaker] {
+    func getSpeaker() -> [Speaker] {
         speakers.filter { $0.id == selectedSpeakerId }
     }
 

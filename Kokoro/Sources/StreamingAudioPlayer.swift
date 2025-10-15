@@ -118,17 +118,17 @@ class StreamingAudioPlayer: NSObject {
         // Detect WAV and parse header for sample rate (and channels if needed)
         let isWAV = data.count >= 44 && data.prefix(4) == "RIFF".data(using: .ascii)
 
-        var srcSampleRate = inputFormat.sampleRate // default to configured input rate
+        var srcSampleRate = inputFormat.sampleRate  // default to configured input rate
         var payload = data
 
         if isWAV {
             // Minimal WAV header parse: mono, 16-bit PCM, read sampleRate at byte offset 24
             let header = data.prefix(44)
-            srcSampleRate = header[24..<28].withUnsafeBytes { raw in
+            srcSampleRate = header[24 ..< 28].withUnsafeBytes { raw in
                 return Double(UInt32(littleEndian: raw.load(fromByteOffset: 0, as: UInt32.self)))
             }
             // Extract payload after 44-byte header
-            payload = data.subdata(in: 44..<data.count)
+            payload = data.subdata(in: 44 ..< data.count)
         }
 
         // Convert 16-bit PCM to Float32 mono buffer in source sample rate
@@ -143,17 +143,19 @@ class StreamingAudioPlayer: NSObject {
             interleaved: false
         )!
 
-        guard let inputBuffer = AVAudioPCMBuffer(
-            pcmFormat: srcFormat,
-            frameCapacity: AVAudioFrameCount(int16Count)
-        ) else { return nil }
+        guard
+            let inputBuffer = AVAudioPCMBuffer(
+                pcmFormat: srcFormat,
+                frameCapacity: AVAudioFrameCount(int16Count)
+            )
+        else { return nil }
 
         inputBuffer.frameLength = AVAudioFrameCount(int16Count)
 
         payload.withUnsafeBytes { bytes in
             let int16Pointer = bytes.bindMemory(to: Int16.self)
             if let channelData = inputBuffer.floatChannelData?[0] {
-                for i in 0..<int16Count {
+                for i in 0 ..< int16Count {
                     let sample = Int16(littleEndian: int16Pointer[i])
                     channelData[i] = Float(sample) / 32768.0
                 }
@@ -161,7 +163,8 @@ class StreamingAudioPlayer: NSObject {
         }
 
         if abs(srcSampleRate - playbackFormat.sampleRate) > 0.1 {
-            print("Sample rate mismatch: src=\(srcSampleRate), playback=\(playbackFormat.sampleRate)")
+            print(
+                "Sample rate mismatch: src=\(srcSampleRate), playback=\(playbackFormat.sampleRate)")
 
             guard let converter = AVAudioConverter(from: srcFormat, to: playbackFormat) else {
                 print("Failed to create converter for sample rate mismatch")
@@ -171,10 +174,12 @@ class StreamingAudioPlayer: NSObject {
             let ratio = playbackFormat.sampleRate / srcSampleRate
             let expectedFrames = AVAudioFrameCount(ceil(Double(inputBuffer.frameLength) * ratio))
 
-            guard let converted = AVAudioPCMBuffer(
-                pcmFormat: playbackFormat,
-                frameCapacity: expectedFrames
-            ) else {
+            guard
+                let converted = AVAudioPCMBuffer(
+                    pcmFormat: playbackFormat,
+                    frameCapacity: expectedFrames
+                )
+            else {
                 print("Failed to allocate conversion buffer")
                 return nil
             }
@@ -217,15 +222,18 @@ class StreamingAudioPlayer: NSObject {
         if let channelData = buffer.floatChannelData?[0], buffer.frameLength > 0 {
             let headCount = min(3, Int(buffer.frameLength))
             let tailCount = min(5, Int(buffer.frameLength))
-            let headSamples = (0..<headCount).map { channelData[$0] }
-            let tailSamples = (0..<tailCount).map { channelData[Int(buffer.frameLength) - tailCount + $0] }
+            let headSamples = (0 ..< headCount).map { channelData[$0] }
+            let tailSamples = (0 ..< tailCount).map {
+                channelData[Int(buffer.frameLength) - tailCount + $0]
+            }
             let headString = headSamples.map { String(format: "%.4f", $0) }.joined(separator: ", ")
             let tailString = tailSamples.map { String(format: "%.4f", $0) }.joined(separator: ", ")
             print("Buffer head samples: [\(headString)]")
             print("Buffer tail samples: [\(tailString)]")
         }
 
-        playerNode.scheduleBuffer(buffer, completionCallbackType: .dataPlayedBack) { [weak self] _ in
+        playerNode.scheduleBuffer(buffer, completionCallbackType: .dataPlayedBack) {
+            [weak self] _ in
             guard let self else { return }
             Task { @MainActor in
                 if self.pendingBufferCount > 0 {
@@ -233,7 +241,9 @@ class StreamingAudioPlayer: NSObject {
                 }
 
                 let time = self.formattedPlaybackTime()
-                print("Buffer rendered, remaining pending: \(self.pendingBufferCount), playback time: \(time)")
+                print(
+                    "Buffer rendered, remaining pending: \(self.pendingBufferCount), playback time: \(time)"
+                )
 
                 if self.isFinishing && self.pendingBufferCount == 0 {
                     self.completePlayback()
@@ -285,7 +295,8 @@ class StreamingAudioPlayer: NSObject {
 
     var currentTime: TimeInterval {
         guard let nodeTime = playerNode.lastRenderTime,
-              let playerTime = playerNode.playerTime(forNodeTime: nodeTime) else {
+            let playerTime = playerNode.playerTime(forNodeTime: nodeTime)
+        else {
             return 0
         }
         return Double(playerTime.sampleTime) / playerTime.sampleRate
@@ -303,7 +314,7 @@ class StreamingAudioPlayer: NSObject {
     private func makeSilenceBuffer(duration: TimeInterval) -> AVAudioPCMBuffer? {
         let frameCount = AVAudioFrameCount(duration * playbackFormat.sampleRate)
         guard frameCount > 0,
-              let buffer = AVAudioPCMBuffer(pcmFormat: playbackFormat, frameCapacity: frameCount)
+            let buffer = AVAudioPCMBuffer(pcmFormat: playbackFormat, frameCapacity: frameCount)
         else { return nil }
 
         buffer.frameLength = frameCount

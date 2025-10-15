@@ -1,5 +1,5 @@
-import Foundation
 import FluidAudio
+import Foundation
 import SegmentTextKit
 
 @available(iOS 16.0, *)
@@ -36,7 +36,8 @@ class KokoroStreamingSynthesizer {
 
         for chunk in chunks {
             if previousSamples == nil && previousPauseMs > 0 {
-                let silence = generateSilence(duration: Double(previousPauseMs) / 1000.0, sampleRate: sampleRate)
+                let silence = generateSilence(
+                    duration: Double(previousPauseMs) / 1000.0, sampleRate: sampleRate)
                 if !silence.isEmpty {
                     await onChunkGenerated(silence)
                 }
@@ -50,17 +51,20 @@ class KokoroStreamingSynthesizer {
                     let data = samplesToWAV(prevSamples, sampleRate: sampleRate)
                     await onChunkGenerated(data)
 
-                    let silence = generateSilence(duration: Double(previousPauseMs) / 1000.0, sampleRate: sampleRate)
+                    let silence = generateSilence(
+                        duration: Double(previousPauseMs) / 1000.0, sampleRate: sampleRate)
                     if !silence.isEmpty {
                         await onChunkGenerated(silence)
                     }
                 } else {
                     let fadeCount = min(crossfadeSamples, prevSamples.count, currentSamples.count)
                     if fadeCount > 0 {
-                        for index in 0..<fadeCount {
+                        for index in 0 ..< fadeCount {
                             let sampleIndex = prevSamples.count - fadeCount + index
-                            let t = fadeCount == 1 ? Float(1.0) : Float(index) / Float(fadeCount - 1)
-                            prevSamples[sampleIndex] = prevSamples[sampleIndex] * (1.0 - t) + currentSamples[index] * t
+                            let t =
+                                fadeCount == 1 ? Float(1.0) : Float(index) / Float(fadeCount - 1)
+                            prevSamples[sampleIndex] =
+                                prevSamples[sampleIndex] * (1.0 - t) + currentSamples[index] * t
                         }
                         currentSamples.removeFirst(fadeCount)
                     }
@@ -74,7 +78,8 @@ class KokoroStreamingSynthesizer {
             previousPauseMs = chunk.pauseAfterMs
 
             if previousSamples == nil && previousPauseMs > 0 {
-                let silence = generateSilence(duration: Double(previousPauseMs) / 1000.0, sampleRate: sampleRate)
+                let silence = generateSilence(
+                    duration: Double(previousPauseMs) / 1000.0, sampleRate: sampleRate)
                 if !silence.isEmpty {
                     await onChunkGenerated(silence)
                 }
@@ -87,13 +92,15 @@ class KokoroStreamingSynthesizer {
             await onChunkGenerated(data)
 
             if previousPauseMs > 0 {
-                let silence = generateSilence(duration: Double(previousPauseMs) / 1000.0, sampleRate: sampleRate)
+                let silence = generateSilence(
+                    duration: Double(previousPauseMs) / 1000.0, sampleRate: sampleRate)
                 if !silence.isEmpty {
                     await onChunkGenerated(silence)
                 }
             }
         } else if previousPauseMs > 0 {
-            let silence = generateSilence(duration: Double(previousPauseMs) / 1000.0, sampleRate: sampleRate)
+            let silence = generateSilence(
+                duration: Double(previousPauseMs) / 1000.0, sampleRate: sampleRate)
             if !silence.isEmpty {
                 await onChunkGenerated(silence)
             }
@@ -121,16 +128,18 @@ class KokoroStreamingSynthesizer {
         // fmt chunk
         data.append("fmt ".data(using: .ascii)!)
         data.append(contentsOf: withUnsafeBytes(of: UInt32(16).littleEndian) { Array($0) })
-        data.append(contentsOf: withUnsafeBytes(of: UInt16(1).littleEndian) { Array($0) }) // PCM
-        data.append(contentsOf: withUnsafeBytes(of: UInt16(1).littleEndian) { Array($0) }) // Mono
+        data.append(contentsOf: withUnsafeBytes(of: UInt16(1).littleEndian) { Array($0) })  // PCM
+        data.append(contentsOf: withUnsafeBytes(of: UInt16(1).littleEndian) { Array($0) })  // Mono
         data.append(contentsOf: withUnsafeBytes(of: UInt32(sampleRate).littleEndian) { Array($0) })
-        data.append(contentsOf: withUnsafeBytes(of: UInt32(sampleRate * 2).littleEndian) { Array($0) })
+        data.append(
+            contentsOf: withUnsafeBytes(of: UInt32(sampleRate * 2).littleEndian) { Array($0) })
         data.append(contentsOf: withUnsafeBytes(of: UInt16(2).littleEndian) { Array($0) })
         data.append(contentsOf: withUnsafeBytes(of: UInt16(16).littleEndian) { Array($0) })
 
         // data chunk
         data.append("data".data(using: .ascii)!)
-        data.append(contentsOf: withUnsafeBytes(of: UInt32(samples.count * 2).littleEndian) { Array($0) })
+        data.append(
+            contentsOf: withUnsafeBytes(of: UInt32(samples.count * 2).littleEndian) { Array($0) })
 
         for sample in samples {
             let clamped = max(-1.0, min(1.0, sample))

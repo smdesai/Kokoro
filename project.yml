@@ -73,7 +73,7 @@ targets:
 
 packages:
   FluidAudio:
-    path: ../FluidAudio-git
+    path: ../FluidAudio-checkin
 
 schemes:
   Kokoro:
