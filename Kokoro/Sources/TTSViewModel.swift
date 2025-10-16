@@ -239,35 +239,31 @@ class TTSViewModel: ObservableObject {
         defer { endBackgroundTask() }
 
         let startTime = Date()
+        let documentsPath = FileManager.default.urls(
+            for: .documentDirectory, in: .userDomainMask
+        ).first!
+        let audioURL = documentsPath.appendingPathComponent("generated_audio.wav")
 
         do {
             await MainActor.run {
                 self.statusMessage = "Loading Kokoro model and resources..."
             }
 
-            var initDuration: TimeInterval = 0
-            if !ttsManager.isAvailable {
-                let initStart = Date()
-                try await ttsManager.initialize()
-                initDuration = Date().timeIntervalSince(initStart)
-            }
-
-            await MainActor.run {
-                self.modelInitTime = initDuration
-                self.statusMessage = "Generating speech..."
-            }
-
-            let audioData = try await ttsManager.synthesize(text: text, voice: voice)
-
+            try await KokoroStreamingSynthesizer.synthesizeStreamingToFile(
+                text: text,
+                voice: voice,
+                ttsManager: ttsManager,
+                outputURL: audioURL,
+                onInitComplete: { initDuration in
+                    Task { @MainActor [weak self] in
+                        guard let self else { return }
+                        self.modelInitTime = initDuration
+                        self.statusMessage = "Generating speech..."
+                    }
+                }
+            )
             let generationEndTime = Date()
             let totalGenerationTime = generationEndTime.timeIntervalSince(startTime)
-
-            let documentsPath = FileManager.default.urls(
-                for: .documentDirectory, in: .userDomainMask
-            ).first!
-            let audioURL = documentsPath.appendingPathComponent("generated_audio.wav")
-
-            try audioData.write(to: audioURL)
 
             // Calculate audio duration
             let audioAsset = AVURLAsset(url: audioURL)
@@ -300,6 +296,7 @@ class TTSViewModel: ObservableObject {
                 self.errorMessage = "Failed to generate audio: \(error.localizedDescription)"
                 self.statusMessage = nil
             }
+            try? FileManager.default.removeItem(at: audioURL)
         }
     }
 
