@@ -123,6 +123,7 @@ struct ContentView: View {
                         //                        }
 
                         VStack(spacing: 16) {
+                            // First Row: Generate File and Play
                             HStack(spacing: 12) {
                                 // Generate File button
                                 Button(action: {
@@ -137,7 +138,7 @@ struct ContentView: View {
                                             .font(.system(size: 24))
                                             .foregroundColor(.blue)
 
-                                        Text("Generate")
+                                        Text("Generate File")
                                             .font(.system(size: 13, weight: .medium))
                                             .foregroundStyle(.primary)
                                     }
@@ -163,69 +164,6 @@ struct ContentView: View {
                                 )
                                 .animation(.easeInOut(duration: 0.2), value: viewModel.isGenerating)
 
-                                // Stream button
-                                Button(action: {
-                                    if viewModel.isStreaming
-                                        || (viewModel.isPlaying
-                                            && viewModel.generationMode == .stream)
-                                    {
-                                        viewModel.stopPlayback()
-                                    } else {
-                                        Task {
-                                            let speaker = speakerModel.getSpeaker().first!
-                                            //                                            await viewModel.streamAudio(from: inputText, voice: speaker.name)
-                                            try await viewModel.emulateStreamingText(
-                                                inputText, voice: speaker.name)
-                                        }
-                                    }
-                                }) {
-                                    VStack(spacing: 8) {
-                                        if viewModel.isStreaming {
-                                            ProgressView()
-                                                .scaleEffect(1.2)
-                                        } else if viewModel.isPlaying
-                                            && viewModel.generationMode == .stream
-                                        {
-                                            Image(systemName: "stop.fill")
-                                                .font(.system(size: 24))
-                                                .foregroundColor(.red)
-                                        } else {
-                                            Image(systemName: "antenna.radiowaves.left.and.right")
-                                                .font(.system(size: 24))
-                                                .foregroundColor(.purple)
-                                        }
-
-                                        Text(
-                                            viewModel.isStreaming
-                                                ? "Streaming"
-                                                : (viewModel.isPlaying
-                                                    && viewModel.generationMode == .stream
-                                                    ? "Stop" : "Stream")
-                                        )
-                                        .font(.system(size: 13, weight: .medium))
-                                        .foregroundStyle(.primary)
-                                    }
-                                    .frame(maxWidth: .infinity)
-                                    .frame(height: 80)
-                                    .background(
-                                        RoundedRectangle(cornerRadius: 12)
-                                            .fill(Color(.secondarySystemBackground))
-                                    )
-                                }
-                                .disabled(
-                                    viewModel.isPreWarming || viewModel.isGenerating
-                                        || inputText.trimmingCharacters(in: .whitespacesAndNewlines)
-                                            .isEmpty
-                                )
-                                .opacity(
-                                    (viewModel.isPreWarming || viewModel.isGenerating
-                                        || inputText.trimmingCharacters(in: .whitespacesAndNewlines)
-                                            .isEmpty)
-                                        ? 0.5 : 1.0
-                                )
-                                .animation(.easeInOut(duration: 0.2), value: viewModel.isStreaming)
-                                .animation(.easeInOut(duration: 0.2), value: viewModel.isPlaying)
-
                                 // Play button
                                 Button(action: {
                                     viewModel.playAudio()
@@ -243,7 +181,7 @@ struct ContentView: View {
 
                                         Text(
                                             viewModel.isPlaying && viewModel.generationMode == .file
-                                                ? "Stop" : "Play"
+                                                ? "Stop" : "Play File"
                                         )
                                         .font(.system(size: 13, weight: .medium))
                                         .foregroundStyle(.primary)
@@ -266,6 +204,165 @@ struct ContentView: View {
                                         || viewModel.generationMode != .file) ? 0.5 : 1.0
                                 )
                                 .animation(.easeInOut(duration: 0.2), value: viewModel.isPlaying)
+                            }
+                            .padding(.horizontal)
+
+                            // Second Row: Streaming Options
+                            HStack(spacing: 12) {
+                                // Batch-then-Stream button (original "Stream")
+                                Button(action: {
+                                    if viewModel.streamingMode == .batch {
+                                        viewModel.stopPlayback()
+                                    } else {
+                                        Task {
+                                            let speaker = speakerModel.getSpeaker().first!
+                                            await viewModel.streamAudio(
+                                                from: inputText, voice: speaker.name)
+                                        }
+                                    }
+                                }) {
+                                    VStack(spacing: 6) {
+                                        if viewModel.isStreaming
+                                            && viewModel.streamingMode == .batch
+                                        {
+                                            ProgressView()
+                                                .scaleEffect(1.2)
+                                        } else if viewModel.isPlaying
+                                            && viewModel.streamingMode == .batch
+                                        {
+                                            Image(systemName: "stop.fill")
+                                                .font(.system(size: 22))
+                                                .foregroundColor(.red)
+                                        } else {
+                                            Image(systemName: "waveform.circle")
+                                                .font(.system(size: 22))
+                                                .foregroundColor(.purple)
+                                        }
+
+                                        Text(
+                                            viewModel.streamingMode == .batch
+                                                && viewModel.isStreaming
+                                                ? "Streaming"
+                                                : (viewModel.streamingMode == .batch
+                                                    && viewModel.isPlaying
+                                                    ? "Stop" : "Batch Stream")
+                                        )
+                                        .font(.system(size: 12, weight: .medium))
+                                        .foregroundStyle(.primary)
+
+                                        Text("(Wait then play)")
+                                            .font(.system(size: 9))
+                                            .foregroundStyle(.secondary)
+                                    }
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: 80)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .fill(Color(.secondarySystemBackground))
+                                    )
+                                }
+                                .disabled(
+                                    viewModel.isPreWarming || viewModel.isGenerating
+                                        || (viewModel.streamingMode != .none
+                                            && viewModel.streamingMode != .batch)
+                                        || inputText.trimmingCharacters(in: .whitespacesAndNewlines)
+                                            .isEmpty
+                                )
+                                .opacity(
+                                    (viewModel.isPreWarming || viewModel.isGenerating
+                                        || (viewModel.streamingMode != .none
+                                            && viewModel.streamingMode != .batch)
+                                        || inputText.trimmingCharacters(in: .whitespacesAndNewlines)
+                                            .isEmpty)
+                                        ? 0.5 : 1.0
+                                )
+                                .animation(.easeInOut(duration: 0.2), value: viewModel.isStreaming)
+                                .animation(.easeInOut(duration: 0.2), value: viewModel.isPlaying)
+                                .animation(
+                                    .easeInOut(duration: 0.2), value: viewModel.streamingMode)
+
+                                // True Streaming button (NEW!)
+                                Button(action: {
+                                    if viewModel.streamingMode == .trueStreaming {
+                                        viewModel.stopPlayback()
+                                    } else {
+                                        Task {
+                                            let speaker = speakerModel.getSpeaker().first!
+                                            // Split text into sentences for true streaming
+                                            let sentences = inputText.components(separatedBy: ". ")
+                                                .filter {
+                                                    !$0.trimmingCharacters(
+                                                        in: .whitespacesAndNewlines
+                                                    ).isEmpty
+                                                }
+                                                .map { $0.hasSuffix(".") ? $0 : $0 + "." }
+
+                                            await viewModel.streamAudioTrueStreamingFromArray(
+                                                textChunks: sentences,
+                                                voice: speaker.name
+                                            )
+                                        }
+                                    }
+                                }) {
+                                    VStack(spacing: 6) {
+                                        if viewModel.isStreaming
+                                            && viewModel.streamingMode == .trueStreaming
+                                        {
+                                            ProgressView()
+                                                .scaleEffect(1.2)
+                                        } else if viewModel.isPlaying
+                                            && viewModel.streamingMode == .trueStreaming
+                                        {
+                                            Image(systemName: "stop.fill")
+                                                .font(.system(size: 22))
+                                                .foregroundColor(.red)
+                                        } else {
+                                            Image(systemName: "bolt.horizontal.circle.fill")
+                                                .font(.system(size: 22))
+                                                .foregroundColor(.orange)
+                                        }
+
+                                        Text(
+                                            viewModel.streamingMode == .trueStreaming
+                                                && viewModel.isStreaming
+                                                ? "Streaming"
+                                                : (viewModel.streamingMode == .trueStreaming
+                                                    && viewModel.isPlaying
+                                                    ? "Stop" : "True Stream")
+                                        )
+                                        .font(.system(size: 12, weight: .medium))
+                                        .foregroundStyle(.primary)
+
+                                        Text("(Low latency)")
+                                            .font(.system(size: 9))
+                                            .foregroundStyle(.secondary)
+                                    }
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: 80)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .fill(Color(.secondarySystemBackground))
+                                    )
+                                }
+                                .disabled(
+                                    viewModel.isPreWarming || viewModel.isGenerating
+                                        || (viewModel.streamingMode != .none
+                                            && viewModel.streamingMode != .trueStreaming)
+                                        || inputText.trimmingCharacters(in: .whitespacesAndNewlines)
+                                            .isEmpty
+                                )
+                                .opacity(
+                                    (viewModel.isPreWarming || viewModel.isGenerating
+                                        || (viewModel.streamingMode != .none
+                                            && viewModel.streamingMode != .trueStreaming)
+                                        || inputText.trimmingCharacters(in: .whitespacesAndNewlines)
+                                            .isEmpty)
+                                        ? 0.5 : 1.0
+                                )
+                                .animation(.easeInOut(duration: 0.2), value: viewModel.isStreaming)
+                                .animation(.easeInOut(duration: 0.2), value: viewModel.isPlaying)
+                                .animation(
+                                    .easeInOut(duration: 0.2), value: viewModel.streamingMode)
                             }
                             .padding(.horizontal)
 

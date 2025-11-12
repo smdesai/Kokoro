@@ -222,4 +222,129 @@ class KokoroChunkedSynthesizer {
         let samples = [Float](repeating: 0, count: sampleCount)
         return (try? AudioWAV.data(from: samples, sampleRate: Double(sampleRate))) ?? Data()
     }
+
+    // MARK: - True Incremental Streaming
+
+    /// Synthesizes audio incrementally from a text stream with true streaming behavior.
+    ///
+    /// **This IS true incremental streaming.** Text is processed as it arrives, and audio
+    /// is generated and emitted immediately without waiting for complete input.
+    ///
+    /// ## Difference from Batch Methods:
+    /// - **Batch methods:** Wait for complete text → generate all audio → emit chunks
+    /// - **This method:** Receive text chunk → generate audio → emit immediately → repeat
+    ///
+    /// ## Use Cases:
+    /// - **LLM Voice Output:** Generate audio as the LLM produces text
+    /// - **Real-Time Transcription:** Convert speech-to-text output to audio
+    /// - **Low-Latency Applications:** Start playback as soon as first sentence is ready
+    ///
+    /// - Parameters:
+    ///   - textStream: Async stream of text chunks (typically sentences or phrases)
+    ///   - voice: Voice identifier for synthesis
+    ///   - ttsManager: Initialized TTS manager
+    ///   - onInitComplete: Called after first chunk initialization
+    ///   - onChunkGenerated: Called for each audio chunk as it's generated
+    ///
+    /// - Note: For best results, send complete sentences or phrases rather than
+    ///   individual words to maintain natural prosody.
+    static func synthesizeTrueStreaming(
+        textStream: AsyncStream<String>,
+        voice: String = "af_heart",
+        ttsManager: TtSManager,
+        onInitComplete: ((TimeInterval) -> Void)? = nil,
+        onChunkGenerated: @escaping (Data) async -> Void
+    ) async throws {
+        var hasReportedInit = false
+        var initDuration: TimeInterval = 0
+
+        if !ttsManager.isAvailable {
+            let initStart = Date()
+            try await ttsManager.initialize()
+            initDuration = Date().timeIntervalSince(initStart)
+        }
+
+        let audioStream = try await ttsManager.synthesizeIncremental(
+            textStream: textStream,
+            voice: voice
+        )
+
+        for await audioData in audioStream {
+            // Report initialization time on first chunk
+            if !hasReportedInit {
+                hasReportedInit = true
+                onInitComplete?(initDuration)
+            }
+
+            // Emit audio chunk immediately
+            await onChunkGenerated(audioData)
+        }
+    }
+
+    /// Synthesizes audio incrementally from a text stream, writing directly to a file.
+    ///
+    /// **This IS true incremental streaming.** Text is processed as it arrives, and audio
+    /// is written to the file incrementally without buffering all audio in memory.
+    ///
+    /// - Parameters:
+    ///   - textStream: Async stream of text chunks (typically sentences or phrases)
+    ///   - voice: Voice identifier for synthesis
+    ///   - ttsManager: Initialized TTS manager
+    ///   - outputURL: File URL where the WAV file will be written
+    ///   - onInitComplete: Called after first chunk initialization
+    ///
+    /// - Note: The file is written incrementally as audio is generated. If the
+    ///   process is interrupted, the file will be incomplete but valid up to the
+    ///   last written chunk.
+    static func synthesizeTrueStreamingToFile(
+        textStream: AsyncStream<String>,
+        voice: String = "af_heart",
+        ttsManager: TtSManager,
+        outputURL: URL,
+        onInitComplete: ((TimeInterval) -> Void)? = nil
+    ) async throws {
+        let writer = try WavStreamWriter(outputURL: outputURL, sampleRate: Double(sampleRate))
+        var didFinish = false
+        defer {
+            if !didFinish {
+                try? writer.finish()
+            }
+        }
+
+        var hasReportedInit = false
+        var initDuration: TimeInterval = 0
+
+        if !ttsManager.isAvailable {
+            let initStart = Date()
+            try await ttsManager.initialize()
+            initDuration = Date().timeIntervalSince(initStart)
+        }
+
+        do {
+            let audioStream = try await ttsManager.synthesizeIncrementalDetailed(
+                textStream: textStream,
+                voice: voice
+            )
+
+            for await result in audioStream {
+                // Report initialization time on first chunk
+                if !hasReportedInit {
+                    hasReportedInit = true
+                    onInitComplete?(initDuration)
+                }
+
+                // Write audio chunks directly to file
+                for chunk in result.chunks {
+                    try chunk.samples.withUnsafeBufferPointer { buffer in
+                        try writer.append(samples: buffer)
+                    }
+                }
+            }
+
+            try writer.finish()
+            didFinish = true
+        } catch {
+            throw error
+        }
+    }
 }

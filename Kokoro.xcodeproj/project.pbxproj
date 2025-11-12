@@ -16,6 +16,7 @@
 		7B94B1432E95D4D300255720 /* kokoro_completev21_int8.mlmodelc in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7B94B1422E95D4C200255720 /* kokoro_completev21_int8.mlmodelc */; };
 		7BB6C7462E98BCA50006170B /* SegmentTextKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7BB6C7452E98BCA50006170B /* SegmentTextKit */; };
 		7BD5A2442EC40A28008F96A5 /* KokoroChunkedSynthesizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD5A2432EC40A28008F96A5 /* KokoroChunkedSynthesizer.swift */; };
+		7BD5A2462EC40C2B008F96A5 /* TtSManager+IncrementalStreaming.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD5A2452EC40C2B008F96A5 /* TtSManager+IncrementalStreaming.swift */; };
 		D819233FF4CA1839DCD1DD6B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E9D31764DF42A394786C70 /* ContentView.swift */; };
 /* End PBXBuildFile section */
 
@@ -41,6 +42,7 @@
 		7B94B1402E95D45700255720 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = Kokoro/Resources/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		7B94B1422E95D4C200255720 /* kokoro_completev21_int8.mlmodelc */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = kokoro_completev21_int8.mlmodelc; sourceTree = "<group>"; };
 		7BD5A2432EC40A28008F96A5 /* KokoroChunkedSynthesizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KokoroChunkedSynthesizer.swift; sourceTree = "<group>"; };
+		7BD5A2452EC40C2B008F96A5 /* TtSManager+IncrementalStreaming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TtSManager+IncrementalStreaming.swift"; sourceTree = "<group>"; };
 		7C498048C9933659E130135E /* FluidAudio-checkin */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "FluidAudio-checkin"; path = "../FluidAudio-checkin"; sourceTree = SOURCE_ROOT; };
 		87E9D31764DF42A394786C70 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		E65D8DBBE9C2B021EA4BFF49 /* TTSViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TTSViewModel.swift; sourceTree = "<group>"; };
@@ -82,6 +84,7 @@
 		34B9D50241E15EA4313C891B /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				7BD5A2452EC40C2B008F96A5 /* TtSManager+IncrementalStreaming.swift */,
 				7BD5A2432EC40A28008F96A5 /* KokoroChunkedSynthesizer.swift */,
 				7B75A75B2EA094FA008B14AF /* WavStreamWriter.swift */,
 				87E9D31764DF42A394786C70 /* ContentView.swift */,
@@ -177,6 +180,7 @@
 				D819233FF4CA1839DCD1DD6B /* ContentView.swift in Sources */,
 				1994172DAB32347265480117 /* KokoroApp.swift in Sources */,
 				7BD5A2442EC40A28008F96A5 /* KokoroChunkedSynthesizer.swift in Sources */,
+				7BD5A2462EC40C2B008F96A5 /* TtSManager+IncrementalStreaming.swift in Sources */,
 				7B75A75C2EA094FA008B14AF /* WavStreamWriter.swift in Sources */,
 				5ADA7923DCDC2B3CAB158FDE /* StreamingAudioPlayer.swift in Sources */,
 				1971847E0899053FCA159707 /* TTSViewModel.swift in Sources */,

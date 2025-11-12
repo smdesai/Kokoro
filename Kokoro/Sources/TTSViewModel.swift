@@ -27,6 +27,7 @@ class TTSViewModel: ObservableObject {
     @Published var chunksGenerated: Int = 0
     @Published var totalChunks: Int = 0
     @Published var generationMode: GenerationMode = .none
+    @Published var streamingMode: StreamingMode = .none
     @Published var isPreWarming = false
     @Published var lastPreWarmDuration: Double?
 
@@ -34,6 +35,12 @@ class TTSViewModel: ObservableObject {
         case none
         case file
         case stream
+    }
+
+    enum StreamingMode {
+        case none
+        case batch
+        case trueStreaming
     }
 
     private var streamingPlayer: StreamingAudioPlayer?
@@ -320,6 +327,7 @@ class TTSViewModel: ObservableObject {
             self.chunksGenerated = 0
             self.totalChunks = 0
             self.generationMode = .stream
+            self.streamingMode = .batch
         }
 
         #if canImport(UserNotifications)
@@ -698,6 +706,7 @@ class TTSViewModel: ObservableObject {
         }
         isPlaying = false
         isStreaming = false
+        streamingMode = .none
         statusMessage = "Playback stopped"
 
         endBackgroundTask()
@@ -708,6 +717,139 @@ class TTSViewModel: ObservableObject {
                 self?.statusMessage = nil
             }
         }
+    }
+
+    // MARK: - True Incremental Streaming
+
+    /// Streams audio with TRUE incremental synthesis - generates audio as text arrives.
+    ///
+    /// This method provides genuine low-latency streaming by processing text incrementally
+    /// as it arrives, generating and playing audio immediately without waiting for complete input.
+    ///
+    /// **Difference from `streamTextChunks()`:**
+    /// - `streamTextChunks()`: Batch-processes each sentence before playing
+    /// - `streamAudioTrueStreaming()`: Generates audio as text arrives, minimal latency
+    ///
+    /// - Parameters:
+    ///   - textStream: Async stream of text (e.g., from an LLM or live input)
+    ///   - voice: Voice identifier for synthesis
+    func streamAudioTrueStreaming(textStream: AsyncStream<String>, voice: String) async {
+        await MainActor.run {
+            self.isStreaming = true
+            self.isPlaying = true
+            self.errorMessage = nil
+            self.statusMessage = "Initializing TTS model..."
+            self.audioDuration = 0.0
+            self.generationTime = 0.0
+            self.modelInitTime = 0.0
+            self.timeToFirstAudio = 0.0
+            self.chunksGenerated = 0
+            self.totalChunks = 0
+            self.generationMode = .stream
+            self.streamingMode = .trueStreaming
+        }
+
+        #if canImport(UserNotifications)
+            requestNotificationAuthorizationIfNeeded()
+        #endif
+
+        beginBackgroundTask(named: "TTSTrueStreaming")
+        defer { endBackgroundTask() }
+
+        generationStartTime = Date()
+        generationEndTime = nil
+        firstChunkTime = nil
+        streamingPlayer = StreamingAudioPlayer()
+
+        do {
+            var isFirstChunk = true
+
+            try await KokoroChunkedSynthesizer.synthesizeTrueStreaming(
+                textStream: textStream,
+                voice: voice,
+                ttsManager: ttsManager,
+                onInitComplete: { [weak self] initDuration in
+                    guard let self else { return }
+                    Task { @MainActor in
+                        self.modelInitTime = initDuration
+                        self.statusMessage = "Streaming audio..."
+                        self.updateMetrics()
+                    }
+                }
+            ) { [weak self] chunkData in
+                guard let self else { return }
+
+                await MainActor.run {
+                    self.chunksGenerated += 1
+                    self.statusMessage = "Streaming chunk \(self.chunksGenerated)..."
+
+                    // Start playback after first chunk is ready
+                    if isFirstChunk {
+                        isFirstChunk = false
+                        self.firstChunkTime = Date()
+                        if let startTime = self.generationStartTime {
+                            self.timeToFirstAudio = self.firstChunkTime!.timeIntervalSince(
+                                startTime)
+                        }
+                        self.streamingPlayer?.startPlayback { [weak self] in
+                            DispatchQueue.main.async {
+                                self?.isPlaying = false
+                                self?.updateMetrics()
+                            }
+                        }
+                    }
+
+                    // Enqueue audio data for immediate playback
+                    self.streamingPlayer?.enqueueAudioData(chunkData)
+                    self.hasGeneratedAudio = true
+                }
+            }
+
+            // Signal end of streaming
+            await MainActor.run {
+                self.generationEndTime = Date()
+                self.streamingPlayer?.finishStreaming()
+                self.isStreaming = false
+                self.statusMessage = "Audio streaming complete"
+                self.updateMetrics()
+                #if canImport(UIKit) && canImport(UserNotifications)
+                    self.notifyCompletionIfBackground(for: .stream)
+                #endif
+            }
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
+                if self?.statusMessage == "Audio streaming complete" {
+                    self?.statusMessage = nil
+                }
+            }
+
+        } catch {
+            await MainActor.run {
+                self.isStreaming = false
+                self.isPlaying = false
+                self.errorMessage = "Failed to stream audio: \(error.localizedDescription)"
+                self.statusMessage = nil
+            }
+        }
+    }
+
+    /// Convenience method to stream audio from an array of text chunks with true streaming.
+    ///
+    /// This is useful when you have pre-segmented text (e.g., from a sentence splitter)
+    /// and want true incremental streaming behavior.
+    ///
+    /// - Parameters:
+    ///   - textChunks: Array of text chunks (typically sentences)
+    ///   - voice: Voice identifier for synthesis
+    func streamAudioTrueStreamingFromArray(textChunks: [String], voice: String) async {
+        let textStream = AsyncStream<String> { continuation in
+            for chunk in textChunks {
+                continuation.yield(chunk)
+            }
+            continuation.finish()
+        }
+
+        await streamAudioTrueStreaming(textStream: textStream, voice: voice)
     }
 
     private final class AudioPlayerDelegate: NSObject, AVAudioPlayerDelegate, Sendable {
