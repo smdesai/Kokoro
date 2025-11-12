@@ -11,11 +11,11 @@
 		1994172DAB32347265480117 /* KokoroApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DEEC4DC2A6A5991649B3EB4 /* KokoroApp.swift */; };
 		222F674BBFA056081B8295D6 /* FluidAudio in Frameworks */ = {isa = PBXBuildFile; productRef = 26DB8398ECEAF80A234657D9 /* FluidAudio */; };
 		5ADA7923DCDC2B3CAB158FDE /* StreamingAudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E961668263E2360B7320FBD8 /* StreamingAudioPlayer.swift */; };
-		6014B9823939107DCFF06EE5 /* KokoroStreamingSynthesizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C27363E27DF288DC13DF5CC6 /* KokoroStreamingSynthesizer.swift */; };
 		7B75A75C2EA094FA008B14AF /* WavStreamWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B75A75B2EA094FA008B14AF /* WavStreamWriter.swift */; };
 		7B94B1412E95D45700255720 /* LaunchScreen.storyboard in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7B94B1402E95D45700255720 /* LaunchScreen.storyboard */; };
 		7B94B1432E95D4D300255720 /* kokoro_completev21_int8.mlmodelc in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7B94B1422E95D4C200255720 /* kokoro_completev21_int8.mlmodelc */; };
 		7BB6C7462E98BCA50006170B /* SegmentTextKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7BB6C7452E98BCA50006170B /* SegmentTextKit */; };
+		7BD5A2442EC40A28008F96A5 /* KokoroChunkedSynthesizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD5A2432EC40A28008F96A5 /* KokoroChunkedSynthesizer.swift */; };
 		D819233FF4CA1839DCD1DD6B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E9D31764DF42A394786C70 /* ContentView.swift */; };
 /* End PBXBuildFile section */
 
@@ -40,9 +40,9 @@
 		7B75A75B2EA094FA008B14AF /* WavStreamWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WavStreamWriter.swift; sourceTree = "<group>"; };
 		7B94B1402E95D45700255720 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = Kokoro/Resources/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		7B94B1422E95D4C200255720 /* kokoro_completev21_int8.mlmodelc */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = kokoro_completev21_int8.mlmodelc; sourceTree = "<group>"; };
+		7BD5A2432EC40A28008F96A5 /* KokoroChunkedSynthesizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KokoroChunkedSynthesizer.swift; sourceTree = "<group>"; };
 		7C498048C9933659E130135E /* FluidAudio-checkin */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "FluidAudio-checkin"; path = "../FluidAudio-checkin"; sourceTree = SOURCE_ROOT; };
 		87E9D31764DF42A394786C70 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		C27363E27DF288DC13DF5CC6 /* KokoroStreamingSynthesizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KokoroStreamingSynthesizer.swift; sourceTree = "<group>"; };
 		E65D8DBBE9C2B021EA4BFF49 /* TTSViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TTSViewModel.swift; sourceTree = "<group>"; };
 		E961668263E2360B7320FBD8 /* StreamingAudioPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamingAudioPlayer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -82,10 +82,10 @@
 		34B9D50241E15EA4313C891B /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				7BD5A2432EC40A28008F96A5 /* KokoroChunkedSynthesizer.swift */,
 				7B75A75B2EA094FA008B14AF /* WavStreamWriter.swift */,
 				87E9D31764DF42A394786C70 /* ContentView.swift */,
 				6DEEC4DC2A6A5991649B3EB4 /* KokoroApp.swift */,
-				C27363E27DF288DC13DF5CC6 /* KokoroStreamingSynthesizer.swift */,
 				E961668263E2360B7320FBD8 /* StreamingAudioPlayer.swift */,
 				E65D8DBBE9C2B021EA4BFF49 /* TTSViewModel.swift */,
 			);
@@ -176,7 +176,7 @@
 			files = (
 				D819233FF4CA1839DCD1DD6B /* ContentView.swift in Sources */,
 				1994172DAB32347265480117 /* KokoroApp.swift in Sources */,
-				6014B9823939107DCFF06EE5 /* KokoroStreamingSynthesizer.swift in Sources */,
+				7BD5A2442EC40A28008F96A5 /* KokoroChunkedSynthesizer.swift in Sources */,
 				7B75A75C2EA094FA008B14AF /* WavStreamWriter.swift in Sources */,
 				5ADA7923DCDC2B3CAB158FDE /* StreamingAudioPlayer.swift in Sources */,
 				1971847E0899053FCA159707 /* TTSViewModel.swift in Sources */,

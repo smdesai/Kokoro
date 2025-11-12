@@ -2,19 +2,54 @@ import FluidAudio
 import Foundation
 import SegmentTextKit
 
+/// Synthesizes audio from text using a batch-then-stream approach.
+///
+/// **Important:** This is NOT true incremental streaming. The full text is processed
+/// upfront by the TTS model, generating all audio chunks in memory before any playback begins.
+/// However, the generated chunks are then emitted progressively, allowing:
+/// - Playback to start while later chunks are being emitted
+/// - Incremental file writing to reduce peak memory usage
+/// - Crossfading between chunks for smooth transitions
+///
+/// **For true incremental streaming** where text arrives over time (e.g., from an LLM),
+/// use the sentence-by-sentence approach in `TTSViewModel.streamTextChunks()`.
+///
+/// ## Execution Flow:
+/// 1. Receives complete text upfront
+/// 2. Calls `ttsManager.synthesizeDetailed()` which generates ALL audio chunks
+/// 3. Iterates through pre-generated chunks
+/// 4. Applies crossfading between adjacent chunks
+/// 5. Emits chunks progressively via callback
+///
+/// ## Use Cases:
+/// - **File Generation:** Write large audio files incrementally to disk
+/// - **Progressive Playback:** Start playing audio before entire file is assembled
+/// - **Memory Optimization:** Process chunks one at a time rather than holding entire WAV
+///
 @available(iOS 16.0, *)
-class KokoroStreamingSynthesizer {
+class KokoroChunkedSynthesizer {
     private static let sampleRate = 24_000
     private static let crossfadeMs = 8
 
-    static func synthesizeStreaming(
+    /// Synthesizes audio from complete text, emitting WAV chunks progressively for playback.
+    ///
+    /// - Note: The entire text is synthesized upfront before any chunks are emitted.
+    ///   This is batch-then-stream, not true incremental streaming.
+    ///
+    /// - Parameters:
+    ///   - text: The complete text to synthesize (must be provided entirely upfront)
+    ///   - voice: Voice identifier for synthesis
+    ///   - ttsManager: Initialized TTS manager
+    ///   - onInitComplete: Called after model initialization with duration
+    ///   - onChunkGenerated: Called for each audio chunk (WAV data) as it's emitted
+    static func synthesizeBatchedWithChunkedPlayback(
         text: String,
         voice: String = "af_heart",
         ttsManager: TtSManager,
         onInitComplete: ((TimeInterval) -> Void)? = nil,
         onChunkGenerated: @escaping (Data) async -> Void
     ) async throws {
-        try await streamChunks(
+        try await processChunks(
             text: text,
             voice: voice,
             ttsManager: ttsManager,
@@ -34,7 +69,19 @@ class KokoroStreamingSynthesizer {
         )
     }
 
-    static func synthesizeStreamingToFile(
+    /// Synthesizes audio from complete text, writing chunks incrementally to a WAV file.
+    ///
+    /// - Note: The entire text is synthesized upfront before any file writing begins.
+    ///   Chunks are written incrementally to reduce peak memory usage, but synthesis
+    ///   itself is not incremental.
+    ///
+    /// - Parameters:
+    ///   - text: The complete text to synthesize (must be provided entirely upfront)
+    ///   - voice: Voice identifier for synthesis
+    ///   - ttsManager: Initialized TTS manager
+    ///   - outputURL: File URL where the WAV file will be written
+    ///   - onInitComplete: Called after model initialization with duration
+    static func synthesizeBatchedToFile(
         text: String,
         voice: String = "af_heart",
         ttsManager: TtSManager,
@@ -50,7 +97,7 @@ class KokoroStreamingSynthesizer {
         }
 
         do {
-            try await streamChunks(
+            try await processChunks(
                 text: text,
                 voice: voice,
                 ttsManager: ttsManager,
@@ -72,7 +119,15 @@ class KokoroStreamingSynthesizer {
         }
     }
 
-    private static func streamChunks(
+    /// Core implementation: batch-synthesizes all audio, then emits chunks progressively.
+    ///
+    /// This method orchestrates the batch-then-stream process:
+    /// 1. Initializes TTS manager if needed
+    /// 2. **Blocks while synthesizing entire text** (via `synthesizeDetailed`)
+    /// 3. Receives all pre-generated chunks
+    /// 4. Iterates through chunks, applying crossfades
+    /// 5. Emits chunks via callbacks
+    private static func processChunks(
         text: String,
         voice: String,
         ttsManager: TtSManager,
@@ -88,6 +143,7 @@ class KokoroStreamingSynthesizer {
         }
         onInitComplete?(initDuration)
 
+        // BATCH SYNTHESIS: All audio is generated here before any emission
         let synthesis = try await ttsManager.synthesizeDetailed(text: text, voice: voice)
         let chunks = synthesis.chunks
 

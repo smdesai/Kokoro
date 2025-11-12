@@ -249,7 +249,7 @@ class TTSViewModel: ObservableObject {
                 self.statusMessage = "Loading Kokoro model and resources..."
             }
 
-            try await KokoroStreamingSynthesizer.synthesizeStreamingToFile(
+            try await KokoroChunkedSynthesizer.synthesizeBatchedToFile(
                 text: text,
                 voice: voice,
                 ttsManager: ttsManager,
@@ -341,9 +341,9 @@ class TTSViewModel: ObservableObject {
 
             var isFirstChunk = true
 
-            // Start streaming synthesis (measure generation time only for synthesis span)
+            // Start batch synthesis with chunked playback (measure generation time only for synthesis span)
             generationStartTime = Date()
-            try await KokoroStreamingSynthesizer.synthesizeStreaming(
+            try await KokoroChunkedSynthesizer.synthesizeBatchedWithChunkedPlayback(
                 text: text,
                 voice: voice,
                 ttsManager: ttsManager,
@@ -569,6 +569,14 @@ class TTSViewModel: ObservableObject {
         streamingSplitter?.reset()
     }
 
+    /// Synthesizes a single sentence with chunked playback.
+    ///
+    /// This provides lower latency than batch-processing all text upfront, as each sentence
+    /// is synthesized independently. However, synthesis of each sentence still completes
+    /// before playback begins (batch-then-stream per sentence).
+    ///
+    /// For true word-by-word streaming, this would need to process text incrementally
+    /// as it arrives, which is not currently implemented.
     private func synthesizeStreamingSentence(_ sentence: String, voice: String) async throws {
         let trimmed = sentence.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
@@ -578,7 +586,7 @@ class TTSViewModel: ObservableObject {
             statusMessage = "Loading Kokoro model and resources..."
         }
 
-        try await KokoroStreamingSynthesizer.synthesizeStreaming(
+        try await KokoroChunkedSynthesizer.synthesizeBatchedWithChunkedPlayback(
             text: trimmed,
             voice: voice,
             ttsManager: ttsManager,
