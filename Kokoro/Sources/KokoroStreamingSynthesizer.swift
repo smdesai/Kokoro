@@ -20,7 +20,7 @@ class KokoroStreamingSynthesizer {
             ttsManager: ttsManager,
             onInitComplete: onInitComplete,
             emitSamples: { samples in
-                let data = samplesToWAV(samples)
+                let data = try AudioWAV.data(from: samples, sampleRate: Double(sampleRate))
                 if !data.isEmpty {
                     await onChunkGenerated(data)
                 }
@@ -164,39 +164,6 @@ class KokoroStreamingSynthesizer {
         let sampleCount = max(0, Int(Double(sampleRate) * duration))
         guard sampleCount > 0 else { return Data() }
         let samples = [Float](repeating: 0, count: sampleCount)
-        return samplesToWAV(samples)
-    }
-
-    private static func samplesToWAV(_ samples: [Float]) -> Data {
-        guard !samples.isEmpty else { return Data() }
-
-        var data = Data()
-
-        data.append("RIFF".data(using: .ascii)!)
-        let fileSize = UInt32(36 + samples.count * 2)
-        data.append(contentsOf: withUnsafeBytes(of: fileSize.littleEndian) { Array($0) })
-        data.append("WAVE".data(using: .ascii)!)
-
-        data.append("fmt ".data(using: .ascii)!)
-        data.append(contentsOf: withUnsafeBytes(of: UInt32(16).littleEndian) { Array($0) })
-        data.append(contentsOf: withUnsafeBytes(of: UInt16(1).littleEndian) { Array($0) })
-        data.append(contentsOf: withUnsafeBytes(of: UInt16(1).littleEndian) { Array($0) })
-        data.append(contentsOf: withUnsafeBytes(of: UInt32(sampleRate).littleEndian) { Array($0) })
-        data.append(
-            contentsOf: withUnsafeBytes(of: UInt32(sampleRate * 2).littleEndian) { Array($0) })
-        data.append(contentsOf: withUnsafeBytes(of: UInt16(2).littleEndian) { Array($0) })
-        data.append(contentsOf: withUnsafeBytes(of: UInt16(16).littleEndian) { Array($0) })
-
-        data.append("data".data(using: .ascii)!)
-        data.append(
-            contentsOf: withUnsafeBytes(of: UInt32(samples.count * 2).littleEndian) { Array($0) })
-
-        for sample in samples {
-            let clamped = max(-1.0, min(1.0, sample))
-            let scaled = Int16(clamped * 32767)
-            data.append(contentsOf: withUnsafeBytes(of: scaled.littleEndian) { Array($0) })
-        }
-
-        return data
+        return (try? AudioWAV.data(from: samples, sampleRate: Double(sampleRate))) ?? Data()
     }
 }

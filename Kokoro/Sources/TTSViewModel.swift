@@ -65,9 +65,9 @@ class TTSViewModel: ObservableObject {
             let splitter = try SentenceSplitter()
             streamingSplitter = StreamingSentenceSplitter(
                 splitter: splitter,
-                threshold: 0.2,
+                threshold: 0.25,  // 0.2
                 stripWhitespace: true,
-                delay: 100
+                delay: 0
             )
         } catch {
             print("Failed to setup audio session: \(error)")
